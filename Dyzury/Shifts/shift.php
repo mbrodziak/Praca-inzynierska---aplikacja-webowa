@@ -81,8 +81,9 @@
 </head>
 
 <body>
+
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	  <a class="navbar-brand" href="/">Dyżury</a>
+	  <a class="navbar-brand" href="/">Strona główna</a>
 
 	  <div class="collapse navbar-collapse" >
 		<ul class="navbar-nav mr-auto">
@@ -120,7 +121,7 @@
 					  <th scope="col">#</th>
 					  <th scope="col">Tytuł</th>
 					  <th scope="col">Rozpoczęcie</th>
-					  <th scope="col">Długość(h)</th>
+					  <th scope="col">Długość (h)</th>
 					  <th scope="col">Wolne miejsca</th>
 					  <th scope="col">Akcje</th>
 					</tr>

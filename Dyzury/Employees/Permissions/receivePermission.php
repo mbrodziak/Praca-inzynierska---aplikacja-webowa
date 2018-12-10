@@ -7,7 +7,7 @@
 			exit(); 
 	}
 	
-	require_once __DIR__ . "/../connect.php";
+	require_once __DIR__ . "/../../connect.php";
 	mysqli_report(MYSQLI_REPORT_STRICT);
 		
 

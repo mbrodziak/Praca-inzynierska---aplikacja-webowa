@@ -11,6 +11,7 @@
 	mysqli_report(MYSQLI_REPORT_STRICT);
 		
 
+	$employees = [];
 	try
 	{
 		$connection = new mysqli($host, $db_user, $db_password, $db_name);
@@ -31,14 +32,8 @@
 			{
 				
 				$row = $result->fetch_assoc();
+				$employees[] = $row;
 				
-				$lp[$i] = $row['id_pracownika']; 
-				$name[$i] = $row['imie'];
-				$surname[$i] = $row['nazwisko'];
-				$birthday[$i] = $row['data_urodzenia'];
-				$email[$i] = $row['adres_email'];
-				$phone[$i] = $row['numer_telefonu'];
-				$admin[$i] = $row['admin'];
 			}
 		}
 		$connection->close();
@@ -61,174 +56,89 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title>Zalogowany</title>
 	
-	<link rel="stylesheet" href="/Style/style.css" type="text/css" />
-	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+	
 	
 </head>
 
 <body>
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <a class="navbar-brand" href="/">Strona główna</a>
+
+	  <div class="collapse navbar-collapse" >
+		<ul class="navbar-nav mr-auto">
+		  <li class="nav-item">
+			<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+		  </li>
+		  <li class="nav-item active">
+			<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
+		  </li>
+		</ul>
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  Mateusz Brodziak
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</nav>
 	
-	<div class="header">
-		Kadra
-	</div>
+	
 	
 	<div class="container">
-	
-		<div class="list"> 
-			<div class="fulfillment"></div>
-			
-			<a href="/signed.php" class="choose_option">
-				<div class="option">
-					Strona główna
-				</div>
-			</a>
-			
-			<a href="/Employees/profil.php" class="choose_option">
-				<div class="option">
-					Profil
-				</div>
-			</a>
-			
-			<a href="/Shifts/shift.php" class="choose_option">
-				<div class="option">
-					Dyżury
-				</div>
-			</a>
-			
-			<?php
-				if($_SESSION['admin'] == 1)
-				{
-					echo '<a href="/Shifts/New/newShift.php" class="choose_option">
-							<div class="option">
-								Dodaj dyżur
-							</div>
-						</a>
-						
-						<a href="/Employees/New/newEmployee.php" class="choose_option">
-							<div class="option">
-								Dodaj pracownika
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/givePermission.php" class="choose_option">
-							<div class="option">
-								Nadaj uprawnienia
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/receivePermission.php" class="choose_option">
-							<div class="option">
-								Odbierz uprawnienia
-							</div class="option">
-						</a>';	
-				}			
-			?>
-						
-			<a href="/Employees/cadre.php" class="choose_option">
-				<div class="option">
-					Kadra
-				</div>
-			</a>
-			
-			<a href="/logout.php" class="logout">
-				<div class="logOut">
-					Wyloguj się 
-				</div>
-			</a>
-			
+		<div class="row">
+			<div class="col">
+				<h3 class="my-3">Lista pracowników</h3>
+				<table class="table table-hover">
+				  <thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Imie i nazwisko</th>
+						<th scope="col">Data urodzenia</th>
+						<th scope="col">Adres e-mail</th>
+						<th scope="col">Numer telefonu</th>
+						<th scope="col">Login</th>
+						<th scope="col">Admin</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<?php
+						foreach ($employees as $employee)
+						{
+							if($employee['admin'] == 1) $employee['admin'] = "Tak";
+							else $employee['admin'] = "Nie";
+							
+							echo " 
+							<tr>
+							  <th scope='row'>" . $employee['id_pracownika'] . "</th>
+							  <td>" . $employee['imie'] . " " . $employee['nazwisko'] . "</td>
+							  <td>" . $employee['data_urodzenia'] . "</td>
+							  <td>" . $employee['adres_email'] . "</td>
+							  <td>" . $employee['login'] . "</td>
+							  <td>" . $employee['login'] . "</td>
+							  <td>" . $employee['admin'] . " </td>
+							</tr>		
+							";
+						}
+					?>
+					
+				  </tbody>
+				</table>
+			</div>
 		</div>
-	
-		<div class="no_name_yet">
-			
-			<div class="cadreNumber">
-				<div class="cadre">L.p</div>
-				<?php
-					echo "<br />";
-					for($i = 1; $i <= $num_rows; $i++)
-					{
-						echo $lp[$i]."<br />";
-						echo "<br />";
-					}
-				?>
-			</div>
-			
-			<div class="cadreNames">
+	</div>	
 
-				<div class="cadre">Imie i nazwisko</div>
-				<?php
-					echo "<br />";
-					for($i = 1; $i <= $num_rows; $i++)
-					{
-						echo $name[$i]." ".$surname[$i]."<br />";
-						echo "<br />";
-					}
-				?>
-			</div>
-			
-			<div class="cadreBirthday">
-				<div class="cadre">Data urodzenia</div>
-				<?php
-					echo "<br />";
-					for($i = 1; $i <= $num_rows; $i++)
-					{
-						echo $birthday[$i]."<br />";
-						echo "<br />";
-					}
-				?>
-			</div> 
-			
-			<div class="cadreEmail">
-				<div class="cadre">Adres e-mail</div>
-				<?php
-					echo "<br />";
-					for($i = 1; $i <= $num_rows; $i++)
-					{
-						echo $email[$i]."<br />";
-						echo "<br />";
-					}
-				?>
-			</div>
-			
-			<div class="cadrePhone">
-				<div class="cadre">Numer telefonu</div>
-				<?php
-					echo "<br />";
-					for($i = 1; $i <= $num_rows; $i++)
-					{
-						echo $phone[$i]."<br />";
-						echo "<br />";
-					}
-				?>
-			</div>
-			
-			<div class="cadreAdmin">
-				<div class="cadre">Admin</div>
-				<?php
-					echo "<br />";
-					for($i = 1; $i <= $num_rows; $i++)
-					{
-						if($admin[$i] == 1)
-						{
-							$czyAdmin[$i] = "Tak";
-						}
-						else
-						{
-							$czyAdmin[$i] = "Nie";
-						}
-						echo $czyAdmin[$i]."<br />";
-						echo "<br />";
-					}
-				?>
-			</div>
-			
-			<div style="clear:both;"></div>
-
-		</div>	
-	
-		<div style="clear:both"></div>
-		
-	</div>
 </body>
 
 

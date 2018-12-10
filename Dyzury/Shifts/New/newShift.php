@@ -54,7 +54,7 @@
 		$_SESSION['rem_shift_length'] = $shift_length;
 		$_SESSION['rem_capacity'] = $capacity;
 		
-		require_once "/xampp/htdocs/connect.php";
+		require_once __DIR__ . "/../../connect.php";
 		mysqli_report(MYSQLI_REPORT_STRICT);
 		
 		try
