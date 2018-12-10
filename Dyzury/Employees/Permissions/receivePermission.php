@@ -7,7 +7,7 @@
 			exit(); 
 	}
 	
-	require_once "connect.php";
+	require_once "/xampp/htdocs/Dyzury/connect.php";
 	mysqli_report(MYSQLI_REPORT_STRICT);
 		
 
@@ -23,7 +23,8 @@
 		}
 		else
 		{
-			$result = $connection->query("select * from pracownicy where admin = 0");
+			$loginn = $_SESSION['login'];
+			$result = $connection->query("select * from pracownicy where admin = 1 and login != '$loginn'");
 			
 			if (!$result) throw new Exception($connection->error);
 			
@@ -40,7 +41,7 @@
 				$email[$i] = $row['adres_email'];
 				$phone[$i] = $row['numer_telefonu'];
 				$login[$i] = $row['login'];
-				$admin[$i] = $row['admin'];
+				$admin[$i] = $row['admin'];				
 			}
 		}
 		$connection->close();
@@ -51,16 +52,16 @@
 		echo '<br />Informacja developerska: '.$e;
 	}
 	
-	if(isset($_POST['employeesNA']))
+		
+	if(isset($_POST['employeesA']))
 	{
-		$employeesNA = $_POST['employeesNA'];
-		for($i = 0; $i < count($employeesNA); $i++)
+		$employeesA = $_POST['employeesA'];
+		for($i = 0; $i < count($employeesA); $i++)
 		{
-			$_SESSION['empNA'][$i] = $employeesNA[$i];
-			header('Location: permission.php');
+			$_SESSION['empA'][$i] = $employeesA[$i];
+			header('Location: /Dyzury/Employees/Permissions/confirmPermission.php');
 		}
 	}
-	
 	
 ?>
 
@@ -73,7 +74,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title>Zalogowany</title>
 	
-	<link rel="stylesheet" href="style.css" type="text/css" />
+	<link rel="stylesheet" href="/Dyzury/Style/style.css" type="text/css" />
 	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
@@ -82,7 +83,7 @@
 <body>
 	
 	<div class="header">
-		NADAJ UPRAWNIENIA
+		ODBIERZ UPRAWNIENIA
 	</div>
 	
 	<div class="container">
@@ -90,19 +91,19 @@
 		<div class="list"> 
 			<div class="fulfillment"></div>
 			
-			<a href="signed.php" class="choose_option">
+			<a href="/Dyzury/signed.php" class="choose_option">
 				<div class="option">
 					Strona główna
 				</div>
 			</a>
 			
-			<a href="profil.php" class="choose_option">
+			<a href="/Dyzury/Employees/profil.php" class="choose_option">
 				<div class="option">
 					Profil
 				</div>
 			</a>
 			
-			<a href="shift.php" class="choose_option">
+			<a href="/Dyzury/Shifts/shift.php" class="choose_option">
 				<div class="option">
 					Dyżury
 				</div>
@@ -111,40 +112,39 @@
 			<?php
 				if($_SESSION['admin'] == 1)
 				{
-					echo '<a href="newShift.php" class="choose_option">
+					echo '<a href="/Dyzury/Shifts/New/newShift.php" class="choose_option">
 							<div class="option">
 								Dodaj dyżur
 							</div>
 						</a>
 						
-						<a href="newEmployee.php" class="choose_option">
+						<a href="/Dyzury/Employees/New/newEmployee.php" class="choose_option">
 							<div class="option">
 								Dodaj pracownika
 							</div class="option">
 						</a>
 						
-						<a href="noAdmin.php" class="choose_option">
+						<a href="/Dyzury/Employees/Permissions/givePermission.php" class="choose_option">
 							<div class="option">
 								Nadaj uprawnienia
 							</div class="option">
 						</a>
 						
-						<a href="Admin.php" class="choose_option">
+						<a href="/Dyzury/Employees/Permissions/receivePermission.php" class="choose_option">
 							<div class="option">
 								Odbierz uprawnienia
 							</div class="option">
 						</a>';	
 				}			
 			?>
-			
-			
-			<a href="cadre.php" class="choose_option">
+						
+			<a href="/Dyzury/Employees/cadre.php" class="choose_option">
 				<div class="option">
 					Kadra
 				</div>
 			</a>
 			
-			<a href="logout.php" class="logout">
+			<a href="/Dyzury/logout.php" class="logout">
 				<div class="logOut">
 					Wyloguj się 
 				</div>
@@ -160,18 +160,18 @@
 						echo "<br />";
 						for($i = 1; $i <= $num_rows; $i++)
 						{
-							echo '<label><input type="checkbox" name="employeesNA[]" value="';
+							echo '<label><input type="checkbox" name="employeesA[]" value="';
 							echo $login[$i];
 							echo '">';
 							echo "  ".$name[$i]." ".$surname[$i]."<br />";
 							echo '</label>';
 							echo "<br />";
-							$_SESSION['givePermission'] = true;
+							$_SESSION['receivePermission'] = true;
 						}
 					?>
 				</div>
 				
-				<input type="submit" id="give" value="NADAJ" />
+				<input type="submit" id="receive" value="ODBIERZ" />
 			</form>
 		</div>
 		
@@ -180,4 +180,6 @@
 		
 	</div>
 </body>
+
+
 </html>

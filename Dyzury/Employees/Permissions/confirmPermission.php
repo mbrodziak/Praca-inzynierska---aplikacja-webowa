@@ -1,4 +1,5 @@
 ﻿<?php
+	
 	session_start();
 	
 	if(!isset($_SESSION['signed']))
@@ -7,22 +8,21 @@
 		exit();
 	}
 	
-	$ready = true;
 	
-	require_once "connect.php";
+	require_once "/xampp/htdocs/Dyzury/connect.php";
 	mysqli_report(MYSQLI_REPORT_STRICT);
-		
+	
 	try
 	{
 		$connection = new mysqli($host, $db_user, $db_password, $db_name);
 		$connection -> query ('SET NAMES utf8');
 		$connection -> query ('SET CHARACTER_SET utf8_unicode_ci');
-		
+	
 		if ($connection->connect_errno != 0)
 		{
 			throw new Exception(mysqli_connect_errno());
 		}
-		else
+		else 
 		{
 			$login = $_SESSION['login'];
 			$result = $connection->query("SELECT * FROM pracownicy where login = '$login'");
@@ -41,53 +41,52 @@
 					$_SESSION['e_password'] = "Błędne hasło!";
 				}
 				else
-				{
-					if ($ready == true)
-					{							
-						if(isset($_SESSION['changeBirthday'])) 
+				{	 
+					if(isset($_SESSION['givePermission']))
+					{
+						//echo "give";
+						for($i = 0; $i < count($_SESSION['empNA']); $i++)
 						{
-							$new_birthday = $_SESSION['changeBirthday'];
-							if ($connection->query("UPDATE pracownicy set data_urodzenia = '$new_birthday' where login = '$login'"))
-							{
-								$_SESSION['succesChanged'] = true;
-								$_SESSION['birthdayChanged'] = true;
-								unset($_SESSION['changeBirthday']);
-								header('Location: changedData.php');
-							}
-							else
-							{
-								throw new Exception($connection->error);
-							}
-						}
+							//echo "givefor";
+							$employeesNA[$i] = $_SESSION['empNA'][$i];
+							$connection->query("UPDATE pracownicy set admin = '1' where login = '$employeesNA[$i]'");
+
+							if ($connection->connect_errno != 0) throw new Exception(mysqli_connect_errno());
 						
-						if(isset($_SESSION['changePhone']))
-						{
-							$new_phone = $_SESSION['changePhone'];
-							if ($connection->query("UPDATE pracownicy set numer_telefonu = '$new_phone' where login = '$login'"))
-							{
-								$_SESSION['succesChanged'] = true;
-								$_SESSION['phoneChanged'] = true;
-								unset($_SESSION['changePhone']);
-								header('Location: changedData.php');
-							}
-							else
-							{
-								throw new Exception($connection->error);
-							}
 						}
+						//echo "givezafor";
+						//unset($_SESSION['givePermission']);
+						unset($_SESSION['empNA']);
+						header('Location: /Dyzury/Employees/Permissions/givedPermission.php');
 					}
-				}	
-			}			
+					
+					if(isset($_SESSION['receivePermission']))
+					{
+						//echo "receive";
+						for($i = 0; $i < count($_SESSION['empA']); $i++)
+						{
+							//echo "receivefor";
+							$employeesA[$i] = $_SESSION['empA'][$i];
+							$connection->query("UPDATE pracownicy set admin = '0' where login = '$employeesA[$i]'");
+							
+							if ($connection->connect_errno != 0) throw new Exception(mysqli_connect_errno());
+						}
+						//echo "receivezafor";
+						//unset($_SESSION['receivePermission']);
+						unset($_SESSION['empA']);
+						header('Location: /Dyzury/Employees/Permissions/receivedPermission.php');
+					}					
+				}
+			}	
 			$connection->close();
 		}
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera!</span>';
+		echo '<span style="color:red;">Błąd serwera! </span>';
 		echo '<br />Informacja developerska: '.$e;
-	}				
-?>
-
+	}
+?>	
 
 <!DOCTYPE HTML>
 <html lang ="pl">
@@ -96,7 +95,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title>Zatwierdź zmianę</title>
 	
-	<link rel="stylesheet" href="style.css" type="text/css" />
+	<link rel="stylesheet" href="/Dyzury/Style/style.css" type="text/css" />
 	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 
@@ -106,7 +105,7 @@
 <body>
 	
 	<div class="header">
-		Edytuj dane
+		Uprawnienia
 	</div>
 	
 	<div class="container">
@@ -114,19 +113,19 @@
 		<div class="list"> 
 			<div class="fulfillment"></div>
 
-			<a href="signed.php" class="choose_option">
+			<a href="/Dyzury/signed.php" class="choose_option">
 				<div class="option">
 					Strona główna
 				</div>
 			</a>
 			
-			<a href="profil.php" class="choose_option">
+			<a href="/Dyzury/Employees/profil.php" class="choose_option">
 				<div class="option">
 					Profil
 				</div>
 			</a>
 			
-			<a href="shift.php" class="choose_option">
+			<a href="/Dyzury/Shifts/shift.php" class="choose_option">
 				<div class="option">
 					Dyżury
 				</div>
@@ -135,39 +134,39 @@
 			<?php
 				if($_SESSION['admin'] == 1)
 				{
-					echo '<a href="newShift.php" class="choose_option">
+					echo '<a href="/Dyzury/Shifts/New/newShift.php" class="choose_option">
 							<div class="option">
 								Dodaj dyżur
 							</div>
 						</a>
 						
-						<a href="newEmployee.php" class="choose_option">
+						<a href="/Dyzury/Employees/New/newEmployee.php" class="choose_option">
 							<div class="option">
 								Dodaj pracownika
 							</div class="option">
 						</a>
 						
-						<a href="noAdmin.php" class="choose_option">
+						<a href="/Dyzury/Employees/Permissions/givePermission.php" class="choose_option">
 							<div class="option">
 								Nadaj uprawnienia
 							</div class="option">
 						</a>
 						
-						<a href="Admin.php" class="choose_option">
+						<a href="/Dyzury/Employees/Permissions/receivePermission.php" class="choose_option">
 							<div class="option">
 								Odbierz uprawnienia
 							</div class="option">
 						</a>';	
 				}			
 			?>
-			
-			<a href="cadre.php" class="choose_option">
+						
+			<a href="/Dyzury/Employees/cadre.php" class="choose_option">
 				<div class="option">
 					Kadra
 				</div>
 			</a>
 			
-			<a href="logout.php" class="logout">
+			<a href="/Dyzury/logout.php" class="logout">
 				<div class="logOut">
 					Wyloguj się 
 				</div>
@@ -193,18 +192,20 @@
 				</div>
 			</form>
 			<div class="cancel"><a href="<?php
-			if(isset($_SESSION['changeBirthday']))
+			if(isset($_SESSION['givePermission']))
 			{
-				echo "changeBirthday.php";
-				unset ($_SESSION['changeBirthday']);
+				echo "/Dyzury/Employees/Permissions/givePermission.php";
+				unset ($_SESSION['givePermission']);
 			}
-			if(isset($_SESSION['changePhone']))
+			
+			if(isset($_SESSION['receivePermission']))
 			{
-				echo "changePhone.php";
-				unset($_SESSION['changePhone']);
+				echo "Dyzury/Employees/Permissions/receivePermission.php";
+				unset($_SESSION['receivePermission']);
 			}
-			?>"><input type="submit" id="cancel" value="ANULUJ" /></a></div>
+
+			?>"><input type="submit" class="cancel" value="ANULUJ" /></a></div>
 		</div>
 	</div>
 </body>
-</html>
+</html>	
