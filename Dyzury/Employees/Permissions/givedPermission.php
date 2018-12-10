@@ -28,7 +28,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title>Dodano pracownika</title>
 	
-	<link rel="stylesheet" href="/Dyzury/Style/style.css" type="text/css" />
+	<link rel="stylesheet" href="/Style/style.css" type="text/css" />
 	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>
@@ -45,19 +45,19 @@
 		<div class="list"> 
 			<div class="fulfillment"></div>
 
-			<a href="/Dyzury/signed.php" class="choose_option">
+			<a href="/signed.php" class="choose_option">
 				<div class="option">
 					Strona główna
 				</div>
 			</a>
 			
-			<a href="/Dyzury/Employees/profil.php" class="choose_option">
+			<a href="/Employees/profil.php" class="choose_option">
 				<div class="option">
 					Profil
 				</div>
 			</a>
 			
-			<a href="/Dyzury/Shifts/shift.php" class="choose_option">
+			<a href="/Shifts/shift.php" class="choose_option">
 				<div class="option">
 					Dyżury
 				</div>
@@ -66,25 +66,25 @@
 			<?php
 				if($_SESSION['admin'] == 1)
 				{
-					echo '<a href="/Dyzury/Shifts/New/newShift.php" class="choose_option">
+					echo '<a href="/Shifts/New/newShift.php" class="choose_option">
 							<div class="option">
 								Dodaj dyżur
 							</div>
 						</a>
 						
-						<a href="/Dyzury/Employees/New/newEmployee.php" class="choose_option">
+						<a href="/Employees/New/newEmployee.php" class="choose_option">
 							<div class="option">
 								Dodaj pracownika
 							</div class="option">
 						</a>
 						
-						<a href="/Dyzury/Employees/Permissions/givePermission.php" class="choose_option">
+						<a href="/Employees/Permissions/givePermission.php" class="choose_option">
 							<div class="option">
 								Nadaj uprawnienia
 							</div class="option">
 						</a>
 						
-						<a href="/Dyzury/Employees/Permissions/receivePermission.php" class="choose_option">
+						<a href="/Employees/Permissions/receivePermission.php" class="choose_option">
 							<div class="option">
 								Odbierz uprawnienia
 							</div class="option">
@@ -92,13 +92,13 @@
 				}			
 			?>
 						
-			<a href="/Dyzury/Employees/cadre.php" class="choose_option">
+			<a href="/Employees/cadre.php" class="choose_option">
 				<div class="option">
 					Kadra
 				</div>
 			</a>
 			
-			<a href="/Dyzury/logout.php" class="logout">
+			<a href="/logout.php" class="logout">
 				<div class="logOut">
 					Wyloguj się 
 				</div>

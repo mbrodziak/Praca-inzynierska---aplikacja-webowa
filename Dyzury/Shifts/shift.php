@@ -6,6 +6,58 @@
 			header('Location: index.php');
 			exit(); 
 	}
+	
+	require_once __DIR__ . "/../connect.php";
+	
+	$query = "SELECT  
+		dyzury.id_dyzuru, 
+		dyzury.tytul_dyzuru,
+		dyzury.godzina_rozpoczecia,
+		dyzury.data_dyzuru,
+		dyzury.dlugosc_dyzuru,
+		dyzury.ilosc_miejsc,
+        (
+        	SELECT  COUNT(*)
+        	FROM    dyzury_pracownikow d
+        	WHERE   d.id_dyzuru = dyzury.id_dyzuru
+        ) as zajete
+	FROM dyzury";
+	
+	mysqli_report(MYSQLI_REPORT_STRICT);
+		
+
+	$shifts = [];
+	
+	try
+	{
+		$connection = new mysqli($host, $db_user, $db_password, $db_name);
+		$connection -> query ('SET NAMES utf8');
+		$connection -> query ('SET CHARACTER_SET utf8_unicode_ci');
+
+		if ($connection->connect_errno != 0)
+		{
+			throw new Exception(mysqli_connect_errno());
+		}
+		else
+		{
+			$result = $connection->query($query);
+			if (!$result) throw new Exception($connection->error);
+			
+			$num_rows = $result->num_rows;
+			
+			for($i = 1; $i <= $num_rows; $i++)
+			{				
+				$row = $result->fetch_assoc();
+				$shifts[] = $row;
+			}
+		}
+		$connection->close();
+	}
+	catch(Exception $e)
+	{
+		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<br />Informacja developerska: '.$e;
+	}
 ?>
 
 
@@ -15,96 +67,87 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 	<title>Zalogowany</title>
+
 	
-	<link rel="stylesheet" href="/Dyzury/Style/style.css" type="text/css" />
-	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+	
 	
 </head>
 
 <body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <a class="navbar-brand" href="/">Dyżury</a>
+
+	  <div class="collapse navbar-collapse" >
+		<ul class="navbar-nav mr-auto">
+		  <li class="nav-item active">
+			<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
+		  </li>
+		</ul>
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  Mateusz Brodziak
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</nav>
 	
-	<div class="header">
-		Dyżury
-	</div>
+	
 	
 	<div class="container">
-	
-		<div class="list"> 
-			<div class="fulfillment"></div>
-			
-			<a href="/Dyzury/signed.php" class="choose_option">
-				<div class="option">
-					Strona główna
-				</div>
-			</a>
-			
-			<a href="/Dyzury/Employees/profil.php" class="choose_option">
-				<div class="option">
-					Profil
-				</div>
-			</a>
-			
-			<a href="/Dyzury/Shifts/shift.php" class="choose_option">
-				<div class="option">
-					Dyżury
-				</div>
-			</a>
-			
-			<?php
-				if($_SESSION['admin'] == 1)
-				{
-					echo '<a href="/Dyzury/Shifts/New/newShift.php" class="choose_option">
-							<div class="option">
-								Dodaj dyżur
-							</div>
-						</a>
-						
-						<a href="/Dyzury/Employees/New/newEmployee.php" class="choose_option">
-							<div class="option">
-								Dodaj pracownika
-							</div class="option">
-						</a>
-						
-						<a href="/Dyzury/Employees/Permissions/givePermission.php" class="choose_option">
-							<div class="option">
-								Nadaj uprawnienia
-							</div class="option">
-						</a>
-						
-						<a href="/Dyzury/Employees/Permissions/receivePermission.php" class="choose_option">
-							<div class="option">
-								Odbierz uprawnienia
-							</div class="option">
-						</a>';	
-				}			
-			?>
-						
-			<a href="/Dyzury/Employees/cadre.php" class="choose_option">
-				<div class="option">
-					Kadra
-				</div>
-			</a>
-			
-			<a href="/Dyzury/logout.php" class="logout">
-				<div class="logOut">
-					Wyloguj się 
-				</div>
-			</a>
-			
+		<div class="row">
+			<div class="col">
+				<h3 class="my-3">Lista dyżurów</h3>
+				<table class="table table-hover">
+				  <thead>
+					<tr>
+					  <th scope="col">#</th>
+					  <th scope="col">Tytuł</th>
+					  <th scope="col">Rozpoczęcie</th>
+					  <th scope="col">Długość(h)</th>
+					  <th scope="col">Wolne miejsca</th>
+					  <th scope="col">Akcje</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<?php
+						foreach ($shifts as $shift)
+						{
+							echo " 
+							<tr>
+							  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
+							  <td>" . $shift['tytul_dyzuru'] . "</td>
+							  <td>" . $shift['data_dyzuru'] . " " . $shift['godzina_rozpoczecia'] . "</td>
+							  <td>" . $shift['dlugosc_dyzuru'] . "</td>
+							  <td>" . ($shift['ilosc_miejsc'] - $shift['zajete']) . "/" . $shift['ilosc_miejsc'] . "</td>
+							  <td> </td>
+							</tr>		
+							";
+						}
+					?>
+					
+				  </tbody>
+				</table>
+			</div>
 		</div>
-	
-		<div class="no_name_yet">
-			Tu będzie kalendarz z dyżurami
-			
-			<div id="editShift"><a href="/Dyzury/Shifts/Edit/editShift.php"><input type="submit" id="editShift" value="EDYTUJ DYŻUR" /></a></div>
-			
-		</div>	
-	
-		<div style="clear:both"></div>
-		
 	</div>
+	
 </body>
 
 
