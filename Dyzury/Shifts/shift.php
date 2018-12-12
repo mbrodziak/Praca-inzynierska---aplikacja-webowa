@@ -67,37 +67,40 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" >
 	<title>Zalogowany</title>
 
 	
-	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-	
 	
 </head>
 
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	  <a class="navbar-brand" href="/">Strona główna</a>
+	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
 
 	  <div class="collapse navbar-collapse" >
 		<ul class="navbar-nav mr-auto">
-		  <li class="nav-item active">
-			<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
-		  </li>
+			<li class="nav-item">
+				<a class="nav-link" href="/">Strona główna</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
+			</li>
 		</ul>
+		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				  Mateusz Brodziak
+					Mateusz Brodziak
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
@@ -117,7 +120,7 @@
 				<h3 class="my-3">Lista dyżurów</h3>
 				<table class="table table-hover">
 				  <thead>
-					<tr>
+					<tr align='center'>
 					  <th scope="col">#</th>
 					  <th scope="col">Tytuł</th>
 					  <th scope="col">Rozpoczęcie</th>
@@ -131,7 +134,7 @@
 						foreach ($shifts as $shift)
 						{
 							echo " 
-							<tr>
+							<tr align='center'>
 							  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
 							  <td>" . $shift['tytul_dyzuru'] . "</td>
 							  <td>" . $shift['data_dyzuru'] . " " . $shift['godzina_rozpoczecia'] . "</td>
@@ -148,8 +151,6 @@
 			</div>
 		</div>
 	</div>
-	
+		
 </body>
-
-
 </html>
