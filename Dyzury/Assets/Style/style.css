@@ -17,7 +17,7 @@ body
 	margin-top: 200px;
 	padding-top: 30px;
 	padding-bottom: 30px;
-	background-image: url(/Style/Images/tlo.jpg);
+	background-image: url(/Assets/Images/tlo.jpg);
 	border-top-left-radius: 20px;
 	border-top-right-radius: 20px;
 	
@@ -38,7 +38,7 @@ body
 
 .header
 {
-	background: url(/Style/Images/tlo.jpg);
+	background: url(/Assets/Images/tlo.jpg);
 	font-size: 30px;
 	text-transform: uppercase;
 	text-align: center;

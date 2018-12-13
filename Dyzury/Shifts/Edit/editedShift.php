@@ -2,24 +2,33 @@
 	
 	session_start();
 	
-	if(!isset($_SESSION['succesChanged']))
+	if(!isset($_SESSION['succes_shift_edit']))
 	{
 		header('Location: index.php');
 		exit();
 	}
 	else
 	{
-		unset($_SESSION['succesChanged']);
+		unset($_SESSION['succes_shift_edit']);
 	}
 	
-	if (isset($_SESSION['rem_new_birthday'])) unset ($_SESSION['rem_new_birthday']);
-	if (isset($_SESSION['rem_new_phone'])) unset ($_SESSION['rem_new_phone']);
+	if (isset($_SESSION['rem_shift_name'])) unset ($_SESSION['rem_shift_name']);
+	if (isset($_SESSION['rem_shift_date'])) unset ($_SESSION['rem_shift_date']);
+	if (isset($_SESSION['rem_shift_start'])) unset ($_SESSION['rem_shift_start']);
+	if (isset($_SESSION['rem_shift_length'])) unset ($_SESSION['rem_shift_length']);
+	if (isset($_SESSION['rem_capacity'])) unset ($_SESSION['rem_capacity']);
 	
-	if (isset($_SESSION['e_new_birthday'])) unset ($_SESSION['e_new_birthday']);
-	if (isset($_SESSION['e_new_phone'])) unset ($_SESSION['e_new_phone']);
-	if (isset($_SESSION['e_old_pass'])) unset ($_SESSION['e_old_pass']);
-	if (isset($_SESSION['e_new_pass'])) unset ($_SESSION['e_new_pass']);
-	if (isset($_SESSION['e_repeat_pass'])) unset ($_SESSION['e_repeat_pass']);
+	if (isset($_SESSION['e_shift_name'])) unset ($_SESSION['e_shift_name']);
+	if (isset($_SESSION['e_shift_date'])) unset ($_SESSION['e_shift_date']);
+	if (isset($_SESSION['e_capacity'])) unset ($_SESSION['e_capacity']);
+	
+	if (isset($_SESSION['shift_name'])) unset ($_SESSION['shift_name']);
+	if (isset($_SESSION['shift_date'])) unset ($_SESSION['shift_date']);
+	if (isset($_SESSION['shift_start'])) unset ($_SESSION['shift_start']);
+	if (isset($_SESSION['shift_length'])) unset ($_SESSION['shift_length']);
+	if (isset($_SESSION['shift_capacity'])) unset ($_SESSION['shift_capacity']);
+	
+	if (isset($_SESSION['ready'])) unset ($_SESSION['ready']);
 ?>
 
 
@@ -30,7 +39,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<title>Zmieniono</title>
+	<title>Dodano dyżur</title>
 	
 	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />	
 	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
@@ -41,7 +50,7 @@
 <body>
 	
 	<div class="header">
-		DODAJ NOWEGO PRACOWNIKA 
+		DODAJ NOWY DYŻUR
 	</div>
 	
 	<div class="container">
@@ -111,28 +120,9 @@
 		</div>
 		
 		<div class="no_name_yet">
-				<?php
-					if(isset($_SESSION['phoneChanged']))
-					{
-						echo '<h2>Zmieniono numer telefonu!</h2>';
-						unset ($_SESSION['phoneChanged']);					
-					}
-					
-					if(isset($_SESSION['birthdayChanged']))
-					{
-						echo '<h2>Zmieniono date urodzenia!</h2>';
-						unset ($_SESSION['birthdayChanged']);					
-					}
-				
-					if(isset($_SESSION['passChanged']))
-					{
-						echo '<h2>Zmieniono hasło!</h2>';
-						unset ($_SESSION['passChanged']);					
-					}				
-				?>				
+				<h2>Pomyślnie edytowano dyżur!</h2>
 		</div>
 	</div>
-	
 	
 </body>
 </html>

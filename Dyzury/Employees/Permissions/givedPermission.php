@@ -28,7 +28,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title>Dodano pracownika</title>
 	
-	<link rel="stylesheet" href="/Style/style.css" type="text/css" />
+	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
 	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>

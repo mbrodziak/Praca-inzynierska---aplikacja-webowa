@@ -24,17 +24,20 @@
 		}
 		else
 		{
-			$login = $_SESSION['login'];
-			$result = $connection->query("select * from pracownicy where login != '$login'");
+			parse_str($_SERVER['QUERY_STRING'], $qs);
+			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
+			
+			$query = "select * from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika 
+			and dyzury_pracownikow.id_dyzuru = '$id'";
+			
+			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
 			$num_rows = $result->num_rows;
-			
+		
 			for($i = 1; $i <= $num_rows; $i++)
-			{
-				
+			{				
 				$row = $result->fetch_assoc();
-				$employees[] = $row;
-				
+				$employees[] = $row;						
 			}
 		}
 		$connection->close();
@@ -55,7 +58,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" >
 	<title>Zalogowany</title>
 	
 	
@@ -107,32 +110,13 @@
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
 					<div>Lista pracowników</div>
-					<?php 
-					if($_SESSION['admin'] == 1)
-					{
-						echo "<a href='/Employees/New/newEmployee.php' class='btn btn-primary'>
-							DODAJ PRACOWNIKA <img src='/Assets/Icons/add.svg' />
-						</a>";
-					}
-					?>
 				</h3>
 				<table class="table table-hover">
 				  <thead>
 					<tr align="center">
 						<th scope="col" >#</th>
 						<th scope="col">Imie i nazwisko</th>
-						<th scope="col">Data urodzenia</th>
-						<th scope="col">Adres e-mail</th>
-						<th scope="col">Numer telefonu</th>
-						<th scope="col">Login</th>
 						<th scope="col">Admin</th>
-						<?php 
-						if($_SESSION['admin'] == 1)
-						{
-							echo "<th scope='col'>Akcje</th>";
-						}
-						?>
-						
 					</tr>
 				  </thead>
 				  <tbody>
@@ -146,18 +130,9 @@
 							<tr align='center'>
 							  <th scope='row'>" . $employee['id_pracownika'] . "</th>
 							  <td>" . $employee['imie'] . " " . $employee['nazwisko'] . "</td>
-							  <td>" . $employee['data_urodzenia'] . "</td>
-							  <td>" . $employee['adres_email'] . "</td>
-							  <td>" . $employee['numer_telefonu'] . "</td>
-							  <td>" . $employee['login'] . "</td>
-							  <td>" . $employee['admin'] . " </td>";
-							  
-							if($_SESSION['admin'] == 1)
-							{
-								echo "<td>" . $employee['admin'] . "</td>";
-							}
-							  
-							echo "</tr>";
+							  <td>" . $employee['admin'] . " </td>
+							</tr>		
+							";
 						}
 					?>
 					

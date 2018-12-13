@@ -28,22 +28,11 @@
 		$polish_char[7] = "ź"; 
 		$polish_char[8] = "ż"; 
 		
-		if($name == NULL)
-		{
-			$ready = false;
-			$_SESSION['e_name'] = "Podaj imię!";
-		}
-		
+
 		if(is_numeric($name))
 		{
 			$ready = false;
 			$_SESSION['e_name'] = "Imię nie może być liczbą!";
-		}
-		
-		if($surname == NULL)
-		{
-			$ready = false;
-			$_SESSION['e_surname'] = "Podaj nazwisko!";
 		}
 		
 		if(is_numeric($surname))
@@ -52,12 +41,6 @@
 			$_SESSION['e_surname'] = "Nazwisko nie może być liczbą!";
 		}
 		
-		if(empty($email))
-		{
-			$ready = false;
-			$_SESSION['e_email'] = "Podaj adres e-mail!";
-		}
-			
 		$emailB = filter_var($email, FILTER_SANITIZE_EMAIL);
 		
 		if (filter_var($emailB, FILTER_VALIDATE_EMAIL == false) || ($emailB != $email))
@@ -86,8 +69,6 @@
 			$ready = false;
 			$_SESSION['e_pass'] = "Hasło musi posiadać od 8 do 20 znaków!";
 		}
-		
-		$pass_length = strlen($pass);
 		
 		$hash_pass = password_hash($pass, PASSWORD_DEFAULT);
 		
@@ -140,7 +121,7 @@
 				if($howmuch_login > 0)
 				{
 					$ready = false;
-					$_SESSION['e_login'] = "Istnieje już pracownik o takim loginie";
+					$_SESSION['e_login'] = "Istnieje już pracownik o takim loginie!";
 				}
 				
 				$result = $connection->query("SELECT id_pracownika FROM pracownicy where adres_email = '$email'");
@@ -151,22 +132,21 @@
 				if($howmuch_email > 0)
 				{
 					$ready = false;
-					$_SESSION['e_email'] = "Istnieje już pracownik o takim adresie e-mail";
+					$_SESSION['e_email'] = "Istnieje już pracownik o takim adresie e-mail!";
 				}
 				
 				if ($ready == true)
 				{
-					$_SESSION['emp_name'] = $name;
-					$_SESSION['emp_surname'] = $surname;
-					$_SESSION['emp_birthday'] = $birthday;
-					$_SESSION['emp_email'] = $email;
-					$_SESSION['emp_phone'] = $phone;
-					$_SESSION['emp_login'] = $login;
-					$_SESSION['emp_pass'] = $hash_pass;
-					$_SESSION['emp_admin'] = $admin2;
-					$_SESSION['ready'] = true;
-					
-					header('Location: /Employees/New/confirmEmployee.php');
+					if ($connection->query("INSERT INTO pracownicy VALUES (NULL, '$name', '$surname', '$birthday', '$email', '$phone', '$login', '$hash_pass', 
+					'$admin2', '0000-00-00 00:00:00')"))
+					{
+						$_SESSION['succes'] = true;
+						header('Location: /Employees/New/addedEmployee.php');
+					}	
+					else
+					{
+						throw new Exception($connection->error);
+					}
 				}
 				$connection->close();
 			}
@@ -186,180 +166,166 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
 	<title>Dodaj nowego pracownika</title>
 	
-	<link rel="stylesheet" href="/Style/style.css" type="text/css" />
-	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
-	<script>
-		
-		
-	
-	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 	
 </head>
 
 <body>
 	
-	<div class="header">
-		DODAJ NOWEGO PRACOWNIKA 
-	</div>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+
+	  <div class="collapse navbar-collapse" >
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="/">Strona główna</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
+			</li>
+		</ul>
+		
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</nav>
 	
 	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Dodaj pracownika</div>
+				</h3>
 	
-		<div class="list"> 
-			<div class="fulfillment"></div>
-
-			<a href="/signed.php" class="choose_option">
-				<div class="option">
-					Strona główna
-				</div>
-			</a>
-			
-			<a href="/Employees/profil.php" class="choose_option">
-				<div class="option">
-					Profil
-				</div>
-			</a>
-			
-			<a href="/Shifts/shift.php" class="choose_option">
-				<div class="option">
-					Dyżury
-				</div>
-			</a>
-			
-			<?php
-				if($_SESSION['admin'] == 1)
-				{
-					echo '<a href="/Shifts/New/newShift.php" class="choose_option">
-							<div class="option">
-								Dodaj dyżur
-							</div>
-						</a>
-						
-						<a href="/Employees/New/newEmployee.php" class="choose_option">
-							<div class="option">
-								Dodaj pracownika
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/givePermission.php" class="choose_option">
-							<div class="option">
-								Nadaj uprawnienia
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/receivePermission.php" class="choose_option">
-							<div class="option">
-								Odbierz uprawnienia
-							</div class="option">
-						</a>';	
-				}			
-			?>
-						
-			<a href="/Employees/cadre.php" class="choose_option">
-				<div class="option">
-					Kadra
-				</div>
-			</a>
-			
-			<a href="/logout.php" class="logout">
-				<div class="logOut">
-					Wyloguj się 
-				</div>
-			</a>
-			
-		</div>
-		
-		<div class="no_name_yet">
-	
-			<form method="post" novalidate>
-				<div id="newEmployee">
-					<input type="text" name="name" id="name" placeholder="Imię" value="<?php
+				<form method="post">
+				  <div class="form-group">				  
+					<label>Imię</label>
+					<input type="text" class="form-control" name="name" id="name" placeholder="Imię" required value="<?php
 					if (isset($_SESSION['rem_name']))
 					{
 						echo $_SESSION['rem_name'];
 						unset($_SESSION['rem_name']);
-					}?>" />
-			
+					}?>" /> 
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_name']))
-						{
-							echo '<div class="error">'.$_SESSION['e_name'].'</div>';
-							unset ($_SESSION['e_name']);
-						}
+					if (isset($_SESSION['e_name']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_name'] .	"</div>";
+						unset ($_SESSION['e_name']);
+					}
 					?> 
-			
-					<input type="text" name="surname" id="surname" placeholder="Nazwisko" value="<?php
+					
+				  <div class="form-group">
+					<label>Nazwisko</label>
+					<input type="text" class="form-control" name="surname" id="surname" required placeholder="Nazwisko" value="<?php
 					if (isset($_SESSION['rem_surname']))
 					{
 						echo $_SESSION['rem_surname'];
 						unset($_SESSION['rem_surname']);
 					}?>"/> 
-			
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_surname']))
-						{
-							echo '<div class="error">'.$_SESSION['e_surname'].'</div>';
-							unset ($_SESSION['e_surname']);
-						}
+					if (isset($_SESSION['e_surname']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_surname'] .	"</div>";
+						unset ($_SESSION['e_surname']);
+					}
 					?> 
-			
-					<input type="text" name="enterBirthday" id="enterBirthday" value="Data urodzenia (opcjonalnie):" disabled /> 
-			
-					<input type="date" name="birthday" id="birthday" value="<?php
+					
+				  
+				  <div class="form-group">
+					<label>Data urodzenia</label>
+					<input type="date" class="form-control" name="birthday" id="birthday" max="1999-12-31" value="<?php
 					if (isset($_SESSION['rem_birhday']))
 					{
 						echo $_SESSION['rem_birhday'];
 						unset($_SESSION['rem_birhday']);
 					}?>"/> 
-			
-					<input type="email" name="email" id="email" placeholder="Adres e-mail" value="<?php
+				   </div>
+				  
+				  <div class="form-group">
+					<label>Adres e-mail</label>
+					<input type="email" class="form-control" name="email" id="email" placeholder="Adres e-mail" required value="<?php
 					if (isset($_SESSION['rem_email']))
 					{
 						echo $_SESSION['rem_email'];
 						unset($_SESSION['rem_email']);
-					}?>" />  
-			
-					<?php
+					}?>" />  		
+				  </div>
+				  
+				  	<?php
 					if (isset($_SESSION['e_email']))
 					{
-						echo '<div class="error">'.$_SESSION['e_email'].'</div>';
-						unset($_SESSION['e_email']);
-					}?> 
-			
-					<input type="tel" name="phone_number" id="phone_number" placeholder="Numer telefonu (opcjonalnie)" pattern="[0-9]{9}" value="<?php
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_email'] .	"</div>";
+						unset ($_SESSION['e_email']);
+					}
+					?> 
+				  
+				  <div class="form-group">
+					<label>Numer telefonu</label>
+					<input type="tel" class="form-control" name="phone_number" id="phone_number" placeholder="Numer telefonu (opcjonalnie)" pattern="[0-9]{9}" value="<?php
 					if (isset($_SESSION['rem_phone']))
 					{
 						echo $_SESSION['rem_phone'];
 						unset($_SESSION['rem_phone']);
 					}?>"/> 
-					
-					<input type="text" name="login" id="login" placeholder="Login" value="<?php
+				  </div>
+				  
+				  <div class="form-group">
+					<label>Login</label>
+					<input type="text" class="form-control" name="login" id="login" placeholder="Login" required value="<?php
 					if (isset($_SESSION['rem_login']))
 					{
 						echo $_SESSION['rem_login'];
 						unset($_SESSION['rem_login']);
 					}?>"/> 
-			
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_login']))
-						{
-							echo '<div class="error">'.$_SESSION['e_login'].'</div>';
-							unset($_SESSION['e_login']);
-					}?> 
-			
-					<input type="password" name="pass" id="pass" placeholder="Hasło" /> <br /> 
-			
+					if (isset($_SESSION['e_login']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_login'] .	"</div>";
+						unset ($_SESSION['e_login']);
+					}
+					?> 
+				  
+				  <div class="form-group">
+					<label>Hasło</label>
+					<input type="password" class="form-control" name="pass" id="pass" placeholder="Hasło" required /> <br />		
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_pass']))
-						{
-							echo '<div class="error">'.$_SESSION['e_pass'].'</div>';
-							unset($_SESSION['e_pass']);
-					}?> 
-			
-					<label><input type="checkbox" name="admin" id="admin"  <?php
+					if (isset($_SESSION['e_pass']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_pass'] .	"</div>";
+						unset ($_SESSION['e_pass']);
+					}
+					?> 
+				  
+				  <div class="form-group form-check">
+					<input type="checkbox" class="form-check-input" name="admin" id="admin"  <?php
 					if (isset($_SESSION['rem_admin']) && $_SESSION['rem_admin'] == 1)
 					{
 						echo "checked";
@@ -368,11 +334,13 @@
 					else{
 						echo "unchecked";
 						unset($_SESSION['rem_admin']);
-					}?>/> Admin </label> 			
-			
-					<input type="submit" id="addEmployee" value="DODAJ PRACOWNIKA" />	
-				</div>			
-			</form>
+					}?>/> 
+					<label> Admin </label> 
+				  </div>
+				  
+				  <button type="submit" class="btn btn-primary">DODAJ PRACOWNIKA</button>				  
+				</form>
+			</div>
 		</div>
 	</div>
 </body>

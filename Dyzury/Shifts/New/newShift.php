@@ -7,6 +7,8 @@
 		header('Location: index.php');
 		exit();
 	}
+	
+	$next_week_date = date("Y-m-d", strtotime("+1 week"));
 							
 	if (isset($_POST['shift_date']))
 	{
@@ -15,7 +17,7 @@
 		$shift_date = $_POST['shift_date'];
 		$shift_start = $_POST['shift_start'];
 		$shift_length = $_POST['shift_length'];
-		$capacity = $_POST['capacity'];	
+		$shift_capacity = $_POST['shift_capacity'];	
 		
 		
 		if($shift_name == NULL)
@@ -28,31 +30,23 @@
 			$ready = false;
 			$_SESSION['e_shift_name'] = "Za długi tytuł!";
 		}
-		
-		$today_date = date("Y-m-d");
-		
-		if($shift_date <= $today_date)
+		 
+		 
+		if($shift_length == NULL)
 		{
-			$ready = false;
-			$_SESSION['e_shift_date'] = "Nie można dodać dyżuru w przeszłości oraz na dzień dzisiejszy!";
-		}
-			 
-		if($capacity < 2 && !($capacity) == NULL)
+			$shift_length = 1;
+		} 
+		 
+		if($shift_capacity == NULL)
 		{
-			$ready = false;
-			$_SESSION['e_capacity'] = "Minimalna ilość miejsc w danym dyżurze to 2!";
-		}		
-		
-		if($capacity == NULL)
-		{
-			$capacity = 2;
+			$shift_capacity = 2;
 		}
 		
 		$_SESSION['rem_shift_name'] = $shift_name;
 		$_SESSION['rem_shift_date'] = $shift_date;
 		$_SESSION['rem_shift_start'] = $shift_start;
 		$_SESSION['rem_shift_length'] = $shift_length;
-		$_SESSION['rem_capacity'] = $capacity;
+		$_SESSION['rem_shift_capacity'] = $shift_capacity;
 		
 		require_once __DIR__ . "/../../connect.php";
 		mysqli_report(MYSQLI_REPORT_STRICT);
@@ -71,14 +65,15 @@
 			{
 				if($ready == true)
 				{
-					$_SESSION['shift_name'] = $shift_name;
-					$_SESSION['shift_date'] = $shift_date;
-					$_SESSION['shift_start'] = $shift_start;
-					$_SESSION['shift_length'] = $shift_length;
-					$_SESSION['capacity'] = $capacity;
-					$_SESSION['ready'] = true;
-					
-					header('Location: /Shifts/New/confirmShift.php');
+						if($connection->query("INSERT INTO dyzury values (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_length', '$shift_capacity')"))
+						{
+							$_SESSION['succes_shift'] = true;
+							header('Location: /Shifts/New/addedShift.php');		
+						}
+						else
+						{
+							throw new Exception($connection->errno);
+						}
 				}
 				$connection->close();
 			}
@@ -100,161 +95,137 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
 	<title>Dodaj nowy dyżur</title>
 	
-	<link rel="stylesheet" href="/Style/style.css" type="text/css" />
-	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 	
 </head>
 
 <body>
 
-	<div class="header">
-		DODAJ NOWY DYŻUR 
-	</div>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+
+	  <div class="collapse navbar-collapse" >
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="/">Strona główna</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
+			</li>
+		</ul>
+		
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</nav>
 	
 	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Dodaj dyżur</div>
+				</h3>
 	
-		<div class="list"> 
-			<div class="fulfillment"></div>
-
-			<a href="/signed.php" class="choose_option">
-				<div class="option">
-					Strona główna
-				</div>
-			</a>
-			
-			<a href="/Employees/profil.php" class="choose_option">
-				<div class="option">
-					Profil
-				</div>
-			</a>
-			
-			<a href="/Shifts/shift.php" class="choose_option">
-				<div class="option">
-					Dyżury
-				</div>
-			</a>
-			
-			<?php
-				if($_SESSION['admin'] == 1)
-				{
-					echo '<a href="/Shifts/New/newShift.php" class="choose_option">
-							<div class="option">
-								Dodaj dyżur
-							</div>
-						</a>
-						
-						<a href="/Employees/New/newEmployee.php" class="choose_option">
-							<div class="option">
-								Dodaj pracownika
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/givePermission.php" class="choose_option">
-							<div class="option">
-								Nadaj uprawnienia
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/receivePermission.php" class="choose_option">
-							<div class="option">
-								Odbierz uprawnienia
-							</div class="option">
-						</a>';	
-				}			
-			?>
-						
-			<a href="/Employees/cadre.php" class="choose_option">
-				<div class="option">
-					Kadra
-				</div>
-			</a>
-			
-			<a href="/logout.php" class="logout">
-				<div class="logOut">
-					Wyloguj się 
-				</div>
-			</a>
-			
-		</div>
-		
-		<div class="no_name_yet">
-	
-			<form method="post">
-				<div id="newShift">
-					<input type="text" name="shift_name" id="shift_name" placeholder="Nazwa dyżuru"  value="<?php
+				<form method="post">
+				  <div class="form-group">
+				  
+					<label>Nazwa dyżuru</label>
+					<input type="text" class="form-control" name="shift_name" id="shift_name" placeholder="Nazwa dyżuru" value="<?php
 					if (isset($_SESSION['rem_shift_name']))
 					{
 						echo $_SESSION['rem_shift_name'];
 						unset($_SESSION['rem_shift_name']);
-					}?>"/> 
-			
+					}?>" />
+					
 					<?php
 						if (isset($_SESSION['e_shift_name']))
 						{
-							echo '<div class="error">'.$_SESSION['e_shift_name'].'</div>';
+							echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_shift_name'] .	"</div>";
 							unset ($_SESSION['e_shift_name']);
 						}
 					?> 
-			
-					<input type="text" name="chooseDateShift" id="chooseDateShift" value="Wybierz datę dyżuru: " disabled/> 
-			
-					<input type="date" name="shift_date" id="shift_date" value="<?php
+					
+				  </div>
+				  
+				  <div class="form-group">
+					<label>Data dyżuru</label>
+					<input type="date" class="form-control" name="shift_date" id="shift_date" placeholder="Data dyżuru" required min="<?php echo $next_week_date ?>" 
+					value="<?php
 					if (isset($_SESSION['rem_shift_date']))
 					{
 						echo $_SESSION['rem_shift_date'];
 						unset($_SESSION['rem_shift_date']);
 					}?>"/>
-			
-					<?php
-						if (isset($_SESSION['e_shift_date']))
-						{
-							echo '<div class="error">'.$_SESSION['e_shift_date'].'</div>';
-							unset ($_SESSION['e_shift_date']);
-						}
+				  </div>
+				  
+				  <?php
+					if (isset($_SESSION['e_shift_date']))
+					{
+						echo '<div class="error">'.$_SESSION['e_shift_date'].'</div>';
+						unset ($_SESSION['e_shift_date']);
+					}
 					?> 
-			
-					<input type="text" name="hourShiftStart" id="hourShiftStart" value="Godzina rozpoczęcia dyżuru: " disabled/> 
-			
-					<input type="time" name="shift_start" id="shift_start" value="<?php
+				  
+				  <div class="form-group">
+					<label>Godzina rozpoczęcia</label>
+					<input type="time" class="form-control" name="shift_start" id="shift_start" placeholder="Godzina rozpoczęcia" required value="<?php
 					if (isset($_SESSION['rem_shift_start']))
 					{
 						echo $_SESSION['rem_shift_start'];
 						unset($_SESSION['rem_shift_start']);
-					}?>" /> 
-			
-					<input type="text" name="hourLengthShift" id="hourLengthShift" value="Długość dyżuru (w godzinach): " disabled/> 
-			
-					<input type="number" name="shift_length" id="shift_length"  placeholder="0" min=0 value="<?php
+					}?>" />
+				  </div>
+				  
+				  <div class="form-group">
+					<label>Długość dyżuru</label>
+					<input type="number" class="form-control" name="shift_length" id="shift_length" placeholder="Długość dyżuru (domyślnie 1h)" min="1" step="0.5" value="<?php
 					if (isset($_SESSION['rem_shift_length']))
 					{
 						echo $_SESSION['rem_shift_length'];
 						unset($_SESSION['rem_shift_length']);
-					}?>" /> 
-			
-					<input type="text" name="places" id="places" value="Ilość miejsc: " disabled/> 
-			
-					<input type="number" name="capacity" id="capacity" placeholder="2" min=2 value="<?php
-					if (isset($_SESSION['rem_capacity']))
+					}?>" />
+				  </div>
+				  
+				  <div class="form-group">
+					<label>Ilość miejsc</label>
+					<input type="number" class="form-control" name="shift_capacity" id="shift_capacity" placeholder="Ilość miejsc (domyślnie 2)" min="2" value="<?php
+					if (isset($_SESSION['rem_shift_capacity']))
 					{
-						echo $_SESSION['rem_capacity'];
-						unset($_SESSION['rem_capacity']);
+						echo $_SESSION['rem_shift_capacity'];
+						unset($_SESSION['rem_shift_capacity']);
 					}?>"/> 
+				  </div>
+				  
+				  <button type="submit" class="btn btn-primary">DODAJ DYŻUR</button>
+				  
+				</form>
 
-					<?php
-					if (isset($_SESSION['e_capacity']))
-					{
-						echo '<div class="error">'.$_SESSION['e_capacity'].'</div>';
-						unset ($_SESSION['e_capacity']);
-					}
-					?> 
-			
-					<input type="submit" id="addShift" value="DODAJ DYŻUR" />	
-				</div>
-			</form>
+			</div>
 		</div>
+	</div>
+	
+</body>	
+</html>
 
 </body>
 

@@ -67,7 +67,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" >
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
 	<title>Zalogowany</title>
 
 	
@@ -100,7 +100,7 @@
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Mateusz Brodziak
+					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
@@ -117,7 +117,17 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h3 class="my-3">Lista dyżurów</h3>
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Lista dyżurów</div>
+					<?php 
+					if($_SESSION['admin'] == 1)
+					{
+						echo "<a href='/Shifts/New/newShift.php' class='btn btn-primary'>
+							DODAJ DYŻUR <img src='/Assets/Icons/add.svg' />
+						</a>";
+					}
+					?>
+				</h3>
 				<table class="table table-hover">
 				  <thead>
 					<tr align='center'>
@@ -140,7 +150,21 @@
 							  <td>" . $shift['data_dyzuru'] . " " . $shift['godzina_rozpoczecia'] . "</td>
 							  <td>" . $shift['dlugosc_dyzuru'] . "</td>
 							  <td>" . ($shift['ilosc_miejsc'] - $shift['zajete']) . "/" . $shift['ilosc_miejsc'] . "</td>
-							  <td> </td>
+							  <td> 
+							  	<a href='/Employees/detailsShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm'>
+									<img src='/Assets/Icons/search.svg' />
+								</a>";
+								if($_SESSION['admin'] == 1)
+								{
+									echo "
+									<a href='/Shifts/Edit/editShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm'>
+										<img src='/Assets/Icons/edit.svg' />
+									</a>
+									<a href='/Shifts/deleteShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-danger btn-sm'>
+										<img src='/Assets/Icons/delete.svg' />
+									</a>";
+								}
+							  echo "</td>
 							</tr>		
 							";
 						}

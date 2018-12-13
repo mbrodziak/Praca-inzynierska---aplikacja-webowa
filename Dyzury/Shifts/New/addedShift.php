@@ -26,7 +26,7 @@
 	if (isset($_SESSION['shift_date'])) unset ($_SESSION['shift_date']);
 	if (isset($_SESSION['shift_start'])) unset ($_SESSION['shift_start']);
 	if (isset($_SESSION['shift_length'])) unset ($_SESSION['shift_length']);
-	if (isset($_SESSION['capacity'])) unset ($_SESSION['capacity']);
+	if (isset($_SESSION['shift_capacity'])) unset ($_SESSION['shift_capacity']);
 	
 	if (isset($_SESSION['ready'])) unset ($_SESSION['ready']);
 ?>
@@ -41,7 +41,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title>Dodano dyżur</title>
 	
-	<link rel="stylesheet" href="/Style/style.css" type="text/css" />	
+	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />	
 	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>
