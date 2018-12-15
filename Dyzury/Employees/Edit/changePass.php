@@ -81,6 +81,11 @@
 						{
 							$_SESSION['succesChanged'] = true;
 							$_SESSION['passChanged'] = true;
+							for($i = 0; $i < strlen($new_pass); $i++)
+							{
+								$new_pass[$i] = "*";
+							}
+							$_SESSION['pass'] = $new_pass;
 							header('Location: /Employees/Edit/changedData.php');
 						}
 						else
@@ -106,131 +111,103 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
 	<title>Zmień hasło</title>
 	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
-	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
-	<script>
-		
-		
-	
-	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 	
 </head>
 
 <body>
 	
-	<div class="header">
-		Edytuj dane
-	</div>
-	
-	<div class="container">
-	
-		<div class="list"> 
-			<div class="fulfillment"></div>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
 
-			<a href="/signed.php" class="choose_option">
-				<div class="option">
-					Strona główna
-				</div>
-			</a>
-			
-			<a href="/Employees/profil.php" class="choose_option">
-				<div class="option">
-					Profil
-				</div>
-			</a>
-			
-			<a href="/Shifts/shift.php" class="choose_option">
-				<div class="option">
-					Dyżury
-				</div>
-			</a>
-			
-			<?php
-				if($_SESSION['admin'] == 1)
-				{
-					echo '<a href="/Shifts/New/newShift.php" class="choose_option">
-							<div class="option">
-								Dodaj dyżur
-							</div>
-						</a>
-						
-						<a href="/Employees/New/newEmployee.php" class="choose_option">
-							<div class="option">
-								Dodaj pracownika
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/givePermission.php" class="choose_option">
-							<div class="option">
-								Nadaj uprawnienia
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/receivePermission.php" class="choose_option">
-							<div class="option">
-								Odbierz uprawnienia
-							</div class="option">
-						</a>';	
-				}			
-			?>
-						
-			<a href="/Employees/cadre.php" class="choose_option">
-				<div class="option">
-					Kadra
-				</div>
-			</a>
-			
-			<a href="/logout.php" class="logout">
-				<div class="logOut">
-					Wyloguj się 
-				</div>
-			</a>
-			
-		</div>
+	  <div class="collapse navbar-collapse" >
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="/">Strona główna</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
+			</li>
+		</ul>
 		
-		<div class="no_name_yet">
-	
-			<form method="post" novalidate>
-				<div class="change">
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</nav>
+		
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Zmień hasło</div>
+				</h3>
 			
-					<input type="password" name="old_pass" id="old_pass" placeholder="Stare hasło" /> <br /> 
-			
+				<form method="post">
+				  <div class="form-group">
+					<label>Stare hasło</label>
+					<input type="password" class="form-control" name="old_pass" id="old_pass" placeholder="Stare hasło" required />	
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_old_pass']))
-						{
-							echo '<div class="error">'.$_SESSION['e_old_pass'].'</div>';
-							unset($_SESSION['e_old_pass']);
-					}?> 
+					if (isset($_SESSION['e_old_pass']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_old_pass'] . "</div>";
+						unset ($_SESSION['e_old_pass']);
+					}
+					?>
 
-					
-					<input type="password" name="new_pass" id="new_pass" placeholder="Nowe hasło" /> <br /> 
-			
+				   <div class="form-group">
+					<label>Nowe hasło</label>
+					<input type="password" class="form-control" name="new_pass" id="new_pass" placeholder="Nowe hasło" required />	
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_new_pass']))
-						{
-							echo '<div class="error">'.$_SESSION['e_new_pass'].'</div>';
-							unset($_SESSION['e_new_pass']);
-					}?> 
-					
-					<input type="password" name="repeat_pass" id="repeat_pass" placeholder="Powtórz hasło" /> <br /> 
-			
+					if (isset($_SESSION['e_new_pass']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_new_pass'] . "</div>";
+						unset ($_SESSION['e_new_pass']);
+					}
+					?>
+
+				  <div class="form-group">
+					<label>Powtórz hasło</label>
+					<input type="password" class="form-control" name="repeat_pass" id="repeat_pass" placeholder="Powtórz hasło" required />	
+				  </div>
+				  
 					<?php
-						if (isset($_SESSION['e_repeat_pass']))
-						{
-							echo '<div class="error">'.$_SESSION['e_repeat_pass'].'</div>';
-							unset($_SESSION['e_repeat_pass']);
-					}?> 
-			
-					<input type="submit" id="confirm" value="ZATWIERDŹ" />
-										
-				</div>			
-			</form>
-			<div class="cancel"><a href="/Employees/Edit/changeDataChoice.php"><input type="submit" id="cancel" value="ANULUJ" /></a></div>
-		</div>
+					if (isset($_SESSION['e_repeat_pass']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_repeat_pass'] . "</div>";
+						unset ($_SESSION['e_repeat_pass']);
+					}
+					?> 
+
+					<button type="submit" class="btn btn-primary">ZMIEŃ HASŁO</button>			
+				</form>
+				<a href="/Employees/profil.php" class="btn btn-primary" role="button" id="cancelPass">ANULUJ</a>
+			</div>			
+		</div>	
 	</div>
 </body>
 </html>

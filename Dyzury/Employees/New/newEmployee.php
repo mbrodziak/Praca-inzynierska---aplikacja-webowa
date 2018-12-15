@@ -137,16 +137,32 @@
 				
 				if ($ready == true)
 				{
-					if ($connection->query("INSERT INTO pracownicy VALUES (NULL, '$name', '$surname', '$birthday', '$email', '$phone', '$login', '$hash_pass', 
-					'$admin2', '0000-00-00 00:00:00')"))
+					$loginn = $_SESSION['login'];
+					$result = $connection->query("SELECT haslo FROM pracownicy where login = '$loginn'");
+					
+					if (!$result) throw new Exception($connection->error);
+						
+					$row = $result->fetch_assoc();
+					$password = $_POST['confirm_pass'];
+				
+					if(!empty($password))
 					{
-						$_SESSION['succes'] = true;
-						header('Location: /Employees/New/addedEmployee.php');
-					}	
-					else
-					{
-						throw new Exception($connection->error);
+						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+						
+						else
+						{
+							if ($connection->query("INSERT INTO pracownicy VALUES (NULL, '$name', '$surname', '$birthday', '$email', '$phone', '$login', 
+							'$hash_pass', '$admin2', '0000-00-00 00:00:00')"))
+							{
+								header('Location: /Employees/cadre.php');
+							}	
+							else
+							{
+								throw new Exception($connection->error);
+							}
+						}
 					}
+					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
 				}
 				$connection->close();
 			}
@@ -170,6 +186,7 @@
 	<title>Dodaj nowego pracownika</title>
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -179,10 +196,10 @@
 
 <body>
 	
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse id="mainmenu" >
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>
@@ -278,7 +295,7 @@
 				  	<?php
 					if (isset($_SESSION['e_email']))
 					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_email'] .	"</div>";
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_email'] . "</div>";
 						unset ($_SESSION['e_email']);
 					}
 					?> 
@@ -306,20 +323,20 @@
 					<?php
 					if (isset($_SESSION['e_login']))
 					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_login'] .	"</div>";
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_login'] . "</div>";
 						unset ($_SESSION['e_login']);
 					}
 					?> 
 				  
 				  <div class="form-group">
 					<label>Hasło</label>
-					<input type="password" class="form-control" name="pass" id="pass" placeholder="Hasło" required /> <br />		
+					<input type="password" class="form-control" name="pass" id="pass" placeholder="Hasło" required /> 	
 				  </div>
 				  
 					<?php
 					if (isset($_SESSION['e_pass']))
 					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_pass'] .	"</div>";
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_pass'] . "</div>";
 						unset ($_SESSION['e_pass']);
 					}
 					?> 
@@ -338,8 +355,25 @@
 					<label> Admin </label> 
 				  </div>
 				  
+				  					
+				  <div class="form-group">
+					<label>Potwierdź dodanie pracownika</label>
+					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
+				  </div>
+				  
+					<?php
+					if (isset($_SESSION['e_password']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] .	"</div>";
+						unset ($_SESSION['e_password']);
+					}
+					?> 
+				  
 				  <button type="submit" class="btn btn-primary">DODAJ PRACOWNIKA</button>				  
 				</form>
+				
+				<a href="/Employees/cadre.php" class="btn btn-primary" role="button" id="cancelEmployee">ANULUJ</a>
+				
 			</div>
 		</div>
 	</div>

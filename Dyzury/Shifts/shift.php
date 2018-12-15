@@ -72,6 +72,7 @@
 
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -81,7 +82,7 @@
 
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
 
 	  <div class="collapse navbar-collapse" >
@@ -151,16 +152,19 @@
 							  <td>" . $shift['dlugosc_dyzuru'] . "</td>
 							  <td>" . ($shift['ilosc_miejsc'] - $shift['zajete']) . "/" . $shift['ilosc_miejsc'] . "</td>
 							  <td> 
-							  	<a href='/Employees/detailsShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm'>
+							  	<a href='/Employees/detailsShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
+								data-toggle='tooltip' data-placement='left' title='Szczegóły dyżuru'>
 									<img src='/Assets/Icons/search.svg' />
 								</a>";
 								if($_SESSION['admin'] == 1)
 								{
 									echo "
-									<a href='/Shifts/Edit/editShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm'>
+									<a href='/Shifts/Edit/editShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
+									data-toggle='tooltip' data-placement='bottom' title='Edytuj dyżur'>
 										<img src='/Assets/Icons/edit.svg' />
 									</a>
-									<a href='/Shifts/deleteShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-danger btn-sm'>
+									<a href='/Shifts/deleteShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-danger btn-sm'
+									data-toggle='tooltip' data-placement='bottom' title='Usuń dyżur'>
 										<img src='/Assets/Icons/delete.svg' />
 									</a>";
 								}

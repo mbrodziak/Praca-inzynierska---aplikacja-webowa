@@ -43,25 +43,49 @@
 				$login[$i] = $row['login'];
 				$admin[$i] = $row['admin'];				
 			}
+			
+			if(isset($_POST['employees']))
+			{			
+				$employees = $_POST['employees'];
+				
+				$login = $_SESSION['login'];
+				$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
+				
+				if (!$result) throw new Exception($connection->error);
+					
+				$row = $result->fetch_assoc();
+				$password = $_POST['confirm_pass'];
+				
+				if(!empty($password))
+				{
+					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+					
+					else
+					{
+						for($i = 0; $i < count($employees); $i++)
+						{
+							if($connection->query("UPDATE pracownicy set admin = '0' where login = '$employees[$i]'"))
+							{
+								header('Location: /Employees/cadre.php');
+							}
+							else
+							{
+								throw new Exception($connection->error);
+							}
+						}
+					}
+				}
+				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+			}
 		}
 		$connection->close();
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 	
-		
-	if(isset($_POST['employeesA']))
-	{
-		$employeesA = $_POST['employeesA'];
-		for($i = 0; $i < count($employeesA); $i++)
-		{
-			$_SESSION['empA'][$i] = $employeesA[$i];
-			header('Location: /Employees/Permissions/confirmPermission.php');
-		}
-	}
 	
 ?>
 
@@ -72,112 +96,93 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
 	<title>Zalogowany</title>
 	
+	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
-	<link rel="stylesheet" href="fontello/css/fontello.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+	
 	
 </head>
 
 <body>
-	
-	<div class="header">
-		ODBIERZ UPRAWNIENIA
-	</div>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+
+	  <div class="collapse navbar-collapse" >
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="/">Strona główna</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link" href="/Employees/cadre.php" >Zarządzaj pracownikami</a>
+			</li>
+		</ul>
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</nav>
 	
 	<div class="container">
-	
-		<div class="list"> 
-			<div class="fulfillment"></div>
-			
-			<a href="/signed.php" class="choose_option">
-				<div class="option">
-					Strona główna
-				</div>
-			</a>
-			
-			<a href="/Employees/profil.php" class="choose_option">
-				<div class="option">
-					Profil
-				</div>
-			</a>
-			
-			<a href="/Shifts/shift.php" class="choose_option">
-				<div class="option">
-					Dyżury
-				</div>
-			</a>
-			
-			<?php
-				if($_SESSION['admin'] == 1)
-				{
-					echo '<a href="/Shifts/New/newShift.php" class="choose_option">
-							<div class="option">
-								Dodaj dyżur
-							</div>
-						</a>
-						
-						<a href="/Employees/New/newEmployee.php" class="choose_option">
-							<div class="option">
-								Dodaj pracownika
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/givePermission.php" class="choose_option">
-							<div class="option">
-								Nadaj uprawnienia
-							</div class="option">
-						</a>
-						
-						<a href="/Employees/Permissions/receivePermission.php" class="choose_option">
-							<div class="option">
-								Odbierz uprawnienia
-							</div class="option">
-						</a>';	
-				}			
-			?>
-						
-			<a href="/Employees/cadre.php" class="choose_option">
-				<div class="option">
-					Kadra
-				</div>
-			</a>
-			
-			<a href="/logout.php" class="logout">
-				<div class="logOut">
-					Wyloguj się 
-				</div>
-			</a>
-			
-		</div>
-	
-		<div class="no_name_yet">
-			
-			<form method="post">
-				<div class="names">
+		<div class="row">
+			<div class="col">
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Odbierz uprawnienia</div>
+				</h3>
+				<form method="post">
+				  <div class="form-group">
 					<?php
-						echo "<br />";
 						for($i = 1; $i <= $num_rows; $i++)
 						{
-							echo '<label><input type="checkbox" name="employeesA[]" value="';
+							echo "<div class='form-group form-check'>
+								<label><input type='checkbox' class='form-check-input' name='employees[]' value='";
 							echo $login[$i];
-							echo '">';
+							echo "'>";
 							echo "  ".$name[$i]." ".$surname[$i]."<br />";
-							echo '</label>';
-							echo "<br />";
-							$_SESSION['receivePermission'] = true;
+							echo "</label>";
+							echo "</div>";
 						}
 					?>
-				</div>
+					
+				  <div class="form-group">
+					<label>Potwierdź nadanie uprawnień</label>
+					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
+				  </div>
+				  
+					<?php
+					if (isset($_SESSION['e_password']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] . "</div>";
+						unset ($_SESSION['e_password']);
+					}
+					?> 
+					 <button type="submit" class="btn btn-primary">ODBIERZ</button>
+				   </div>
+				</form>
 				
-				<input type="submit" id="receive" value="ODBIERZ" />
-			</form>
+				<a href="/Employees/cadre.php" class="btn btn-primary" role="button" id="cancelReceive">ANULUJ</a>
+				
+			</div>
 		</div>
-		
-	
-		<div style="clear:both"></div>
-		
 	</div>
 </body>
 

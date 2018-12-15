@@ -1,553 +1,76 @@
 body
 {
-	background-color: #002147;
-	color: white;
-	font-family: 'Lato', sans-serif;
-	font-size: 20px;
-	margin: 0;
-	
+	background-color: #eeeeee;
+	font-family: 'Lato', sans-serif;	
 }
 
 #loginPanel
 {
-	width: 550px;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-	margin-top: 200px;
-	padding-top: 30px;
-	padding-bottom: 30px;
-	background-image: url(/Assets/Images/tlo.jpg);
-	border-top-left-radius: 20px;
-	border-top-right-radius: 20px;
-	
-}
-	
-#loginField
-{
-	width: 550px;
-	margin-left: auto;
-	margin-right: auto;
-	padding-top: 10px;
-	padding-bottom: 30px;
-	background-color: #128870;
-	text-align: center;
-	border-bottom-left-radius: 20px;
-	border-bottom-right-radius: 20px;
-}
-
-.header
-{
-	background: url(/Assets/Images/tlo.jpg);
-	font-size: 30px;
-	text-transform: uppercase;
-	text-align: center;
-	padding: 10px 0px 10px 0px;
-	letter-spacing: 3px;
-	border-bottom: 3px solid #000000;
-}
-
-.container
-{
-	width: 1000px;
-	height: 700px;
-	background-color: #d3d3d3;
-	margin-left: auto;
-	margin-right: auto;
-	border-right: 3px solid #000000;
-	border-bottom: 3px solid #000000;
-}
-
-.list
-{
-	float: left;
-	background-color: #a0a0a0;
-	width: 170px;
-	height: 700px;
-	text-align: center;
-	border-right: 3px solid #000000;
-	border-left: 3px solid #000000;
-	border-bottom: 3px solid #000000;
-	padding-left: 15px;
-	padding-right: 15px;
-}
-
-.no_name_yet
-{
-	float: left;
-	width: 775px;
-	background-color: #d3d3d3;
-	color: black;
-	margin: 10px;
-}
-
-.fulfillment
-{
-	height: 30px;
-}
-
-a:link.choose_option,
-a:link.logout
-{
-	color: black;
-	font-size: 20px;
-	cursor: pointer;
-	text-decoration: none;
-}
-
-a:visited.choose_option,
-a:visited.logout
-{
-	color: black;
-	font-size: 20px;
-	cursor: pointer;
-	text-decoration: none;
-}
-
-a:hover.choose_option
-{
-	background-color: #128870;
-}
-
-a:hover.logout
-{
-	background-color: #002147;;
-}
-
-a:active.choose_option,
-a:active.logout
-{
-	color: black;
-	font-size: 20px;
-	cursor: pointer;
-	text-decoration: none;
-}
-
-.option
-{
-	padding-top: 10px;
-	padding-bottom: 10px;
-	border-bottom: 2px dotted #000000;
-	cursor: pointer;
-}
-
-.option:hover 
-{
-	background-color: #128870;
-	color: #DDDDDD;
-}
-
-.logOut
-{
-	padding-top: 10px;
-	padding-bottom: 10px;
-	cursor: pointer;
-}
-
-.logOut:hover
-{
-	background-color: #002147;
-	color: #FFFFFF
-}
-
-#newEmployee
-{
-	width: 350px;
-	background-color: #128870;
-	text-align: center;
-	padding-top: 10px;
-	padding-bottom: 30px;
-	padding-left: 90px;
-	padding-right: 90px;
-	border-radius: 20px;
-	color: #DDDDDD;
-	position: relative;
-	top: 70px;
-	left: 122px;
-}
-
-#newShift
-{
-	width: 350px;
-	padding-top: 10px;
-	padding-bottom: 30px;
-	padding-left: 90px;
-	padding-right: 90px;
-	text-align: center;
-	background-color: #128870;
-	border-radius: 20px;
-	position: relative;
-	top: 70px;
-	left: 122px;
-}
-
-input[type=submit]
-{
-	width: 300px;
-	height: 35px;
-	color: white;
-	margin-top: 20px;
-	background-color: #002147;
-	border-style: solid;
-	border-color: #002147;
-	border-radius: 20px;
-	font-size: 15px;
-	letter-spacing: 2px;
-	cursor: pointer;
-}
-
-input[type=submit]:hover
-{
-	background-color: #001036;
-}
-
-input[type=text],
-input[type=password],
-input[type=email],
-input[type=tel]
-{
-	width: 300px;
-	height: 25px;
-	background-color: #d3d3d3;
-	margin-top: 20px;
-	border: 3px solid #d3d3d3;
-	border-radius: 20px;
-	text-align: center;
-}
-
-input[type=text]:focus,
-input[type=password]:focus,
-input[type=email]:focus,
-input[type=tel]:focus,
-input[type=date]:focus,
-input[type=time]:focus,
-input[type=number]:focus
-{
-	border: 3px solid #002147;
-}
-
-input[type=checkbox]
-{
-	margin-top: 20px;
-}
-
-input[type=submit]:focus
-{
-	background-color: #001036;
-}
-
-#enterBirthday, #chooseDateShift
-{
-	background-color: #d3d3d3;
-	width: 190px;
-	height: 25px;
-	text-align: center;
-	color: black;
-	border: 3px solid #d3d3d3;
-	border-top-left-radius: 20px;
-	border-bottom-left-radius: 20px;
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
-	margin-top: 20px;	
-	position: relative;
-	top: 2.5px;
-	left: 2px;
-	
-}
-
-#birthday, #new_birthday, #shift_date
-{
-	background-color: #d3d3d3;
-	width: 110px;
-	height: 25px;
-	border: 3px solid #d3d3d3;
-	border-top-right-radius: 20px;
-	border-bottom-right-radius: 20px;
-	position: relative;
-	right: 2px;
-}
-
-#hourShiftStart
-{
-	background-color: #d3d3d3;
-	width: 230px;
-	height: 25px;
-	text-align: center;
-	color: black;
-	border-style: solid;
-	border-top-left-radius: 20px;
-	border-bottom-left-radius: 20px;
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
-	position: relative;	
-	top: 2.5px;
-	left: 2px;
-}
-
-#shift_start
-{
-	background-color: #d3d3d3;
-	width: 70px;
-	height: 26px;
-	border-style: solid;
-	border-top-right-radius: 20px;
-	border-bottom-right-radius: 20px;
-	position: relative;
-	right: 2px;
-}
-
-#hourLengthShift, #places
-{
-	background-color: #d3d3d3;
-	width: 240px;
-	height: 25px;
-	text-align: center;
-	color: black;
-	border-style: solid;
-	border-top-left-radius: 20px;
-	border-bottom-left-radius: 20px;
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
-	position: relative;
-	top: 2,5px;
-	left: 2px;
-}
-
-#shift_length, #capacity
-{
-	background-color: #d3d3d3;
-	width: 60px;
-	height: 27px;
-	border-style: solid;
-	border-top-right-radius: 20px;
-	border-bottom-right-radius: 20px;
-	text-align: center;
-	position: relative;
-	right: 2px;
-}
-
-.img
-{
-	float: left;
-	width: 300px;
-	height: 50px;
-}
-
-.profil_info
-{
-	float: left;
-}
-
-.description
-{
-	float:left;
-	width: 170px;
-	position: relative;
-	top: 50px;
-	border-top: 2px solid #000000;
-	border-bottom: 2px solid #000000;
-	border-left: 2px solid #000000;
-	..border-right: 2px dotted #000000;
-	text-align: center;
-}
-
-.information
-{
-	float:left;
-	width: 300px;
-	position: relative;
-	top: 50px;
-	border-top: 2px solid #000000;
-	border-bottom: 2px solid #000000;
-	border-right: 2px solid #000000;
-	text-align: center;
-}
-
-#changeData
-{
-	margin-top: 30px;
-	text-align: center;
-}
-
-#changeData a
-{
-	text-decoration: none;
-}
-
-.options
-{
-	background-color: #002147;
-	margin-top: 30px;
-	font-size: 30px;
-	width: 490px;
-	border-radius: 20px;
-	padding: 20px 20px 30px 20px;
-	text-align: center;
-	position: relative;
-	top: 100px;
-	left: 122px;
-	color: #DDDDDD;
-}
-
-a
-{
-	text-decoration: none;
-}
-
-.options:hover
-{
-	background-color: #001036;
-}
-
-.change
-{
-	width: 350px;
-	background-color: #128870;
-	text-align: center;
-	padding-top: 10px;
-	padding-bottom: 40px;
-	padding-left: 90px;
-	padding-right: 90px;
-	border-radius: 20px;
-	color: #DDDDDD;
-	position: relative;
-	top: 70px;
-	left: 122px;
-}
-
-#further
-{
-	width: 150px;
-	position: relative;
-	left: -85px;
-}
-
-.cancel input
-{
-	text-align: center;
-	position: relative;
-	width: 150px;
-	left: 395px;
-	top: -25px;
-}
-
-#confirm 
-{
-	width: 150px;
-	position: relative;
-	left: -85px;
-}
-
-.cadreNumber
-{
-	float: left;
-	font-size: 15px;
-	width: 30px;
-	border-right: 2px dotted #000000;
-	border-left: 2px solid #000000;
-	border-bottom: 2px solid #000000;
-	text-align: center;
-	position: relative;
-}
-
-.cadreNames
-{
-	float: left;
-	font-size: 15px;
-	width: 170px;
-	border-right: 2px dotted #000000;
-	..border-left: 2px dotted #000000;
-	border-bottom: 2px solid #000000;
-	text-align: center;
-	position: relative;
-}
-
-.cadreBirthday
-{
-	float: left;
-	font-size: 15px;
-	width: 134px;
-	border-right: 2px dotted #000000;
-	border-bottom: 2px solid #000000;
-	text-align: center;
-}
-
-.cadreEmail
-{
-	float: left;
-	font-size: 15px;
-	width: 225px;
-	border-right: 2px dotted #000000;
-	border-bottom: 2px solid #000000;
-	text-align: center;
-}
-
-.cadrePhone
-{
-	float: left;
-	font-size: 15px;
-	border-right: 2px dotted #000000;
-	border-bottom: 2px solid #000000;
-	width: 134px;
-	text-align: center;
-}
-
-.cadreAdmin
-{
-	float: left;
-	font-size: 15px;
-	border-right: 2px solid #000000;
-	border-bottom: 2px solid #000000;
-	width: 70px;
-	text-align: center;	
-}
-
-.no_name_yet h2
-{
-	background-color: #128870;
-	font-size: 30px;
-	width: 490px;
-	border-radius: 20px;
-	padding: 40px 20px 50px 20px;
-	text-align: center;
 	position: relative;
 	top: 200px;
-	left: 122px;
-	color: #DDDDDD;
+	background-color: #dddddd;
+	padding: 20px;
 }
 
-.no_name_yet h3
+#cancel
 {
-	font-size: 17px;
-	font-weight: 400;
+	position: relative;
+	left: 94px;
+	top: -38px;
 }
 
-p
+#cancelPass
 {
-	font-size: 18px;
-	font-weight: 700;
-	border-top: 2px solid #000000;
-	border-bottom: 2px solid #000000;
-	
+	position: relative;
+	left: 142px;
+	top: -37px;
 }
 
-.cadre
+#cancelEmployee
 {
-	font-size: 18px;
-	font-weight: 700;
-	border-top: 2px solid #000000;
-	border-bottom: 2px solid #000000;
-	padding: 5px 0px 5px 0px;
+	position: relative;
+	left: 203px;
+	top: -38px;
 }
 
-.error
+#cancelShift
 {
-	color: #CF1020;
+	position: relative;
+	left: 147px;
+	top: -37px;
 }
 
+#cancelGive
+{
+	position: relative;
+	left: 89px;
+	top: -53px;
+}
 
+#cancelReceive
+{
+	position: relative;
+	left: 105px;
+	top: -53px;
+}
 
+#cancelEditShift
+{
+	position: relative;
+	left: 128px;
+	top: -37px;
+}
 
+#cancelDelete
+{
+	position: relative;
+	left: 128px;
+	top: -37px;
+}
 
+#confirm_pass
+{
+	background-color: #dddddd;
+}
 
 

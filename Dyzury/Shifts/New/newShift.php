@@ -65,15 +65,32 @@
 			{
 				if($ready == true)
 				{
-						if($connection->query("INSERT INTO dyzury values (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_length', '$shift_capacity')"))
-						{
-							$_SESSION['succes_shift'] = true;
-							header('Location: /Shifts/New/addedShift.php');		
-						}
+					$loginn = $_SESSION['login'];
+					$result = $connection->query("SELECT haslo FROM pracownicy where login = '$loginn'");
+					
+					if (!$result) throw new Exception($connection->error);
+						
+					$row = $result->fetch_assoc();
+					$password = $_POST['confirm_pass'];
+				
+					if(!empty($password))
+					{
+						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+						
 						else
 						{
-							throw new Exception($connection->errno);
+							if($connection->query("INSERT INTO dyzury values (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_length', 
+							'$shift_capacity')"))
+							{
+								header('Location: /Shifts/shift.php');		
+							}
+							else
+							{
+								throw new Exception($connection->errno);
+							}
 						}
+					}
+					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
 				}
 				$connection->close();
 			}
@@ -99,6 +116,7 @@
 	<title>Dodaj nowy dyżur</title>
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -108,7 +126,7 @@
 
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
 
 	  <div class="collapse navbar-collapse" >
@@ -216,10 +234,25 @@
 					}?>"/> 
 				  </div>
 				  
+				  <div class="form-group">
+					<label>Potwierdź dodanie dyżuru</label>
+					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
+				  </div>
+				  
+					<?php
+					if (isset($_SESSION['e_password']))
+					{
+						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] .	"</div>";
+						unset ($_SESSION['e_password']);
+					}
+					?> 
+				  
 				  <button type="submit" class="btn btn-primary">DODAJ DYŻUR</button>
 				  
 				</form>
 
+				<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelShift">ANULUJ</a>
+				
 			</div>
 		</div>
 	</div>
