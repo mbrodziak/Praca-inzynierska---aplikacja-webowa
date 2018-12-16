@@ -93,8 +93,12 @@
 	
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse" id="mainmenu">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>

@@ -7,10 +7,9 @@
 			exit(); 
 	}
 	
-	require_once __DIR__ . "/../../connect.php";
+	require_once __DIR__ . "/../connect.php";	
 	mysqli_report(MYSQLI_REPORT_STRICT);
-		
-
+			
 	try
 	{
 		$connection = new mysqli($host, $db_user, $db_password, $db_name);
@@ -23,82 +22,51 @@
 		}
 		else
 		{
-			$loginn = $_SESSION['login'];
-			$result = $connection->query("select * from pracownicy where admin = 1 and login != '$loginn'");
+			parse_str($_SERVER['QUERY_STRING'], $qs);
+			$id = mysqli_real_escape_string($connection, $qs['employee_id']);
+			
+			$login = $_SESSION['login'];
+			$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
 			
 			if (!$result) throw new Exception($connection->error);
-			
-			$num_rows = $result->num_rows;
-			
-			for($i = 1; $i <= $num_rows; $i++)
-			{	
-				$row = $result->fetch_assoc();
 				
-				$lp[$i] = $row['id_pracownika']; 
-				$name[$i] = $row['imie'];
-				$surname[$i] = $row['nazwisko'];
-				$birthday[$i] = $row['data_urodzenia'];
-				$email[$i] = $row['adres_email'];
-				$phone[$i] = $row['numer_telefonu'];
-				$login[$i] = $row['login'];
-				$admin[$i] = $row['admin'];				
-			}
+			$row = $result->fetch_assoc();
 			
-			if(isset($_POST['employees']))
-			{			
-				$employees = $_POST['employees'];
-				
-				$login = $_SESSION['login'];
-				$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
-				
-				if (!$result) throw new Exception($connection->error);
-					
-				$row = $result->fetch_assoc();
+			if(isset($_POST['confirm_pass']))
+			{
 				$password = $_POST['confirm_pass'];
-				
 				if(!empty($password))
 				{
 					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
 					
 					else
 					{
-						for($i = 0; $i < count($employees); $i++)
-						{
-							if($connection->query("UPDATE pracownicy set admin = '0' where login = '$employees[$i]'"))
-							{
-								header('Location: /Employees/cadre.php');
-							}
-							else
-							{
-								throw new Exception($connection->error);
-							}
-						}
+						$result = $connection->query("delete from pracownicy where id_pracownika = '$id' limit 1");
+						header('Location: cadre.php');
+					
+						if (!$result) throw new Exception($connection->error);
 					}
 				}
-				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";		
 			}
 		}
 		$connection->close();
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera!</span>';
+		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
-	
-	
 ?>
-
-
 
 <!DOCTYPE HTML>
 <html lang ="pl">
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
-	<title>Zalogowany</title>
-	
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" >
+	<title>Potwierdzanie usunięcia dyżuru</title>
+
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
@@ -106,7 +74,6 @@
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-	
 	
 </head>
 
@@ -127,10 +94,11 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Shifts/shift.php">Zarządzaj dyżurami</a>
 			</li>
-			<li class="nav-item active">
-				<a class="nav-link" href="/Employees/cadre.php" >Zarządzaj pracownikami</a>
+			<li class="nav-item">
+				<a class="nav-link active" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
 		</ul>
+		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -150,28 +118,15 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Odbierz uprawnienia</div>
+					<div>Potwierdzanie usunięcia pracownika</div>
 				</h3>
+				
 				<form method="post">
-				  <div class="form-group">
-					<?php
-						for($i = 1; $i <= $num_rows; $i++)
-						{
-							echo "<div class='form-group form-check'>
-								<label><input type='checkbox' class='form-check-input' name='employees[]' value='";
-							echo $login[$i];
-							echo "'>";
-							echo "  ".$name[$i]." ".$surname[$i]."<br />";
-							echo "</label>";
-							echo "</div>";
-						}
-					?>
-					
-				  <div class="form-group">
-					<label>Potwierdź odebranie uprawnień</label>
-					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
-				  </div>
-				  
+					<div class="form-group">
+						<label>Potwierdź usunięcie pracownika</label>
+						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
+					</div>
+					  
 					<?php
 					if (isset($_SESSION['e_password']))
 					{
@@ -179,15 +134,17 @@
 						unset ($_SESSION['e_password']);
 					}
 					?> 
-					 <button type="submit" class="btn btn-primary">ODBIERZ</button>
-				   </div>
-				</form>
+					
+					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
+				</form>		
 				
-				<a href="/Employees/cadre.php" class="btn btn-primary" role="button" id="cancelReceive">ANULUJ</a>			
+				<a href="/Employees/cadre.php" class="btn btn-primary" role="button" id="cancelDelete">ANULUJ</a>
+				
 			</div>
 		</div>
 	</div>
 </body>
-
-
 </html>
+
+
+

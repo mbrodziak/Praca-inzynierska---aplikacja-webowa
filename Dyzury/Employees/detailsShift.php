@@ -28,7 +28,7 @@
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
 			
 			$query = "select * from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika 
-			and dyzury_pracownikow.id_dyzuru = '$id'";
+			and dyzury_pracownikow.id_dyzuru = '$id' and dyzury_pracownikow.potwierdzone = 1";
 			
 			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
@@ -44,7 +44,7 @@
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 	
@@ -76,8 +76,12 @@
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse" id="mainmenu">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>

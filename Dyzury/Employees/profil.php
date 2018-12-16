@@ -65,8 +65,12 @@
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse" id="mainmenu">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>
@@ -100,11 +104,11 @@
 		</h3>
 		
 		<div class="row my-4">	
-			<div class="col-sm-4">
+			<div class="col">
 				<img src="/Assets/Images/profil.jpg" alt="profil" class="img-thumbnail">
 			</div>
 			
-			<div class="col-sm-4">
+			<div class="col">
 				<?php
 					echo "Imie:  ";
 					echo "<br />";
@@ -122,7 +126,7 @@
 				?>
 			</div>
 			
-			<div class="col-sm-4">
+			<div class="col">
 				<?php
 					echo $_SESSION['name'];
 					echo "<br />";

@@ -39,6 +39,7 @@
 				if (!$result) throw new Exception($connection->error);
 					
 				$row = $result->fetch_assoc();
+				$can_edit = true;
 				
 				if(isset($_POST['confirm_pass']))
 				{
@@ -57,7 +58,7 @@
 						
 							if (!$result) throw new Exception($connection->error);
 							
-							header('Location: shift.php');
+							header('Location: /Shifts/shift.php');
 						}
 					}
 					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
@@ -65,7 +66,9 @@
 			}
 			else
 			{
-				$alert("Nie można edytować dyżuru!");
+				//$_SESSION['errorr'] = "<div class='alert alert-danger' role='alert'>Nie można usunąć dyżuru!</div>";
+				//header('Location: shift.php');
+				$can_edit = false;
 			}								
 		}
 		$connection->close();
@@ -99,8 +102,12 @@
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse" id="mainmenu">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>
@@ -138,7 +145,10 @@
 				<form method="post">
 					<div class="form-group">
 						<label>Potwierdź usunięcie dyżuru</label>
-						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
+						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
+					<?php 
+						echo !$can_edit ? "disabled" : "";
+					?> />	
 					</div>
 					  
 					<?php
@@ -149,10 +159,19 @@
 					}
 					?> 
 					
-					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
-				</form>		
+					<button type="submit" class="btn btn-primary"
+					<?php 
+						echo !$can_edit ? "disabled" : "";
+					?>>ZATWIERDŹ</button>
+				</form>	
 				
 				<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelDelete">ANULUJ</a>
+				
+				<?php 
+					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
+						Nie można usunąć dyżuru!
+					</div>";			
+				?>
 				
 			</div>
 		</div>

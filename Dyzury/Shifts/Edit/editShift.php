@@ -41,16 +41,13 @@
 					WHERE   d.id_dyzuru = dyzury.id_dyzuru
 				) as zajete 
 			FROM dyzury where id_dyzuru = '$id' limit 1";
-		
-
-			
+					
 			$result = $connection->query($query);
 			
 			if (!$result) throw new Exception($connection->error);
 			
 			$shift = $result->fetch_assoc();
 			$can_edit = $shift['data_dyzuru'] >= $next_week_date;
-			
 			
 			if (isset($_POST['shift_date']))
 			{
@@ -60,8 +57,7 @@
 				$shift_start = $_POST['shift_start'];
 				$shift_length = $_POST['shift_length'];
 				$shift_capacity = $_POST['shift_capacity'];	
-				
-				
+								
 				if($shift_name == NULL)
 				{
 					$shift_name = "Bez tytułu";
@@ -115,7 +111,7 @@
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie dyżuru w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}				
 	
@@ -143,8 +139,12 @@
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse" id="mainmenu">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>
@@ -188,7 +188,13 @@
 				<form method="post">
 				  <div class="form-group">
 					<label>Nazwa dyżuru</label>
-					<input type="text" class="form-control" name="shift_name" id="shift_name" placeholder="Nazwa dyżuru" value="<?php echo $shift['tytul_dyzuru'] ?>" 
+					<input type="text" class="form-control" name="shift_name" id="shift_name" placeholder="Nazwa dyżuru" value="<?php 
+					if(isset($_SESSION['rem_shift_name']))
+					{
+						echo $_SESSION['rem_shift_name'];
+						unset($_SESSION['rem_shift_name']);
+					}
+					else echo $shift['tytul_dyzuru']; ?>" 
 					<?php 
 						echo !$can_edit ? "disabled" : "";
 					?>/>
@@ -197,7 +203,13 @@
 				  <div class="form-group">
 					<label>Data dyżuru</label>
 					<input type="date" class="form-control" name="shift_date" id="shift_date" placeholder="Data dyżuru" min="<?php echo $next_week_date ?>" 
-					value="<?php echo $shift['data_dyzuru'] ?>" 
+					value="<?php
+					if (isset($_SESSION['rem_shift_date']))
+					{
+						echo $_SESSION['rem_shift_date'];
+						unset($_SESSION['rem_shift_date']);	
+					}
+					else echo $shift['data_dyzuru'] ?>" 
 					<?php 
 						echo !$can_edit ? "disabled" : "";
 					?>/>
@@ -206,7 +218,13 @@
 				  <div class="form-group">
 					<label>Godzina rozpoczęcia</label>
 					<input type="time" class="form-control" name="shift_start" id="shift_start" placeholder="Godzina rozpoczęcia" 
-					value="<?php echo $shift['godzina_rozpoczecia'] ?>"
+					value="<?php 					
+					if (isset($_SESSION['rem_shift_start']))
+					{
+						echo $_SESSION['rem_shift_start'];
+						unset($_SESSION['rem_shift_start']);
+					}
+					else echo $shift['godzina_rozpoczecia'] ?>"
 					<?php 
 						echo !$can_edit ? "disabled" : "";
 					?>/>
@@ -214,7 +232,13 @@
 				  
 				  <div class="form-group">
 					<label>Długość dyżuru</label>
-					<input type="number" class="form-control" name="shift_length" id="shift_length" placeholder="Długość dyżuru" min="1" step="0.5" value="<?php echo $shift['dlugosc_dyzuru'] ?>" 
+					<input type="number" class="form-control" name="shift_length" id="shift_length" placeholder="Długość dyżuru" min="1" step="0.5" value="<?php 
+					if (isset($_SESSION['rem_shift_length']))
+					{
+						echo $_SESSION['rem_shift_length'];
+						unset($_SESSION['rem_shift_length']);
+					}
+					else echo $shift['dlugosc_dyzuru'] ?>" 
 					<?php 
 						echo !$can_edit ? "disabled" : "";
 					?>/>
@@ -223,7 +247,13 @@
 				  <div class="form-group">
 					<label>Ilość miejsc</label>
 					<input type="number" class="form-control" name="shift_capacity" id="shift_capacity" placeholder="Ilość miejsc" 
-					min="<?php echo $shift['zajete'] > 2 ? $shift['zajete'] : 2 ?>" value="<?php echo $shift['ilosc_miejsc'] ?>"
+					min="<?php echo $shift['zajete'] > 2 ? $shift['zajete'] : 2 ?>" value="<?php
+					if (isset($_SESSION['rem_shift_capacity']))
+					{
+						echo $_SESSION['rem_shift_capacity'];
+						unset($_SESSION['rem_shift_capacity']);
+					}					
+					else echo $shift['ilosc_miejsc'] ?>"
 					<?php 
 						echo !$can_edit ? "disabled" : "";
 					?>/>

@@ -19,7 +19,7 @@
         (
         	SELECT  COUNT(*)
         	FROM    dyzury_pracownikow d
-        	WHERE   d.id_dyzuru = dyzury.id_dyzuru
+        	WHERE   d.id_dyzuru = dyzury.id_dyzuru and d.potwierdzone = 1 or d.zarejestrowanie = 0
         ) as zajete
 	FROM dyzury";
 	
@@ -55,7 +55,7 @@
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 ?>
@@ -84,8 +84,12 @@
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	 
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-	  <div class="collapse navbar-collapse" >
+	  <div class="collapse navbar-collapse" id="mainmenu">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" href="/">Strona główna</a>
@@ -96,6 +100,14 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/confirmEmployeeonShift.php'>Potwierdzenia</a>
+				</li>";
+			}
+			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -155,7 +167,16 @@
 							  	<a href='/Employees/detailsShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
 								data-toggle='tooltip' data-placement='left' title='Szczegóły dyżuru'>
 									<img src='/Assets/Icons/search.svg' />
+								</a>
+								<a href='/Shifts/Register/registerOnShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
+								data-toggle='tooltip' data-placement='left' title='Zarejestruj się na dyżur'>
+									<img src='/Assets/Icons/group_add.svg' />
+								</a>
+								<a href='/Shifts/Deregister/deregisterOnShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
+								data-toggle='tooltip' data-placement='left' title='Wyrejestruj się z dyżuru'>
+									<img src='/Assets/Icons/person.svg' />
 								</a>";
+								
 								if($_SESSION['admin'] == 1)
 								{
 									echo "
