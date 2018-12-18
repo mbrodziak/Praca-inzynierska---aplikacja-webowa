@@ -7,10 +7,11 @@
 			exit(); 
 	}
 	
-	$next_week_date = date("Y-m-d", strtotime("+1 week"));
 	require_once __DIR__ . "/../connect.php";	
 	mysqli_report(MYSQLI_REPORT_STRICT);
-			
+				
+	$shifts = [];
+	
 	try
 	{
 		$connection = new mysqli($host, $db_user, $db_password, $db_name);
@@ -24,58 +25,45 @@
 		else
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
-			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
+			$id = mysqli_real_escape_string($connection, $qs['id']);
 			
-			$result = $connection->query("select data_dyzuru from dyzury where id_dyzuru = '$id' limit 1");
+			$login = $_SESSION['login'];
+			$result = $connection->query("SELECT id_pracownika, haslo FROM pracownicy where login = '$login'");
+			$can_edit = true;
+			
 			if (!$result) throw new Exception($connection->error);
+				
 			$row = $result->fetch_assoc();
-			$shift_date = $row['data_dyzuru'];
 			
-			if($shift_date >= $next_week_date)
+			if(isset($_POST['confirm_pass']))
 			{
-				$login = $_SESSION['login'];
-				$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
-				
-				if (!$result) throw new Exception($connection->error);
-					
-				$row = $result->fetch_assoc();
-				$can_edit = true;
-				
-				if(isset($_POST['confirm_pass']))
+				$password = $_POST['confirm_pass'];
+				if(!empty($password))
 				{
-					$password = $_POST['confirm_pass'];
-					if(!empty($password))
-					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+					
+					else
+					{	
+						$id_employee = $row['id_pracownika'];
 						
+						if($connection->query("delete from dyzury_pracownikow where id = '$id'"))
+						{					
+							header('Location: /Shifts/shift.php');	
+						}
 						else
 						{
-							$result = $connection->query("delete from dyzury where id_dyzuru = '$id' limit 1");
-						
-							if (!$result) throw new Exception($connection->error);
-						
-							$result = $connection->query("delete from dyzury_pracownikow where id_dyzuru = '$id' limit 1");
-						
-							if (!$result) throw new Exception($connection->error);
-							
-							header('Location: /Shifts/shift.php');
+							throw new Exception($connection->errno);
 						}
 					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
-				}			
-			}
-			else
-			{
-				//$_SESSION['errorr'] = "<div class='alert alert-danger' role='alert'>Nie można usunąć dyżuru!</div>";
-				//header('Location: shift.php');
-				$can_edit = false;
-			}								
-		}
+				}
+				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+			}			
+		}								
 		$connection->close();
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 ?>
@@ -122,12 +110,9 @@
 			if($_SESSION['admin'] == 1)
 			{
 				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+					<a class='nav-link' href='/Shifts/Register/confirmEmployeeonShift.php'>Zgłoszenia</a>
 				</li>";
 			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
 			?>
 		</ul>
 		
@@ -150,12 +135,12 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Potwierdzanie usunięcia dyżuru</div>
+					<div>Potwierdzanie wycofanie zgłoszenia</div>
 				</h3>
 				
 				<form method="post">
 					<div class="form-group">
-						<label>Potwierdź usunięcie dyżuru</label>
+						<label>Potwierdź wycofanie zgłoszenia</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
 					<?php 
 						echo !$can_edit ? "disabled" : "";
@@ -170,19 +155,15 @@
 					}
 					?> 
 					
-				<div>
-					<button type="submit" class="btn btn-primary"
-					<?php 
-						echo !$can_edit ? "disabled" : "";
-					?>>ZATWIERDŹ</button>
-					
-					<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelDelete">ANULUJ</a>
-				</div>
-				</form>	
-				
+					<div>
+						<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
+						<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+					</div>
+				</form>
+
 				<?php 
 					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
-						Nie można usunąć dyżuru!
+						Brak wolnych miejsc!
 					</div>";			
 				?>
 				
@@ -191,5 +172,3 @@
 	</div>
 </body>
 </html>
-
-

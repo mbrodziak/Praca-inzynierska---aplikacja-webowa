@@ -28,7 +28,8 @@
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
 			
 			$query = "select * from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika 
-			and dyzury_pracownikow.id_dyzuru = '$id' and dyzury_pracownikow.potwierdzone = 1";
+			and dyzury_pracownikow.id_dyzuru = '$id' and (dyzury_pracownikow.potwierdzone = 1 
+			OR (dyzury_pracownikow.potwierdzone = 0 and dyzury_pracownikow.zarejestrowanie = 0))";
 			
 			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
@@ -39,6 +40,24 @@
 				$row = $result->fetch_assoc();
 				$employees[] = $row;						
 			}
+			
+			$result2 = $connection->query("SELECT * FROM dyzury where id_dyzuru = '$id'");
+			if (!$result2) throw new Exception($connection->error);
+			
+			$row2 = $result2->fetch_assoc();
+			
+			$id_shift = $row2['id_dyzuru'];
+			$shift_name = $row2['tytul_dyzuru'];
+			$shift_date = $row2['data_dyzuru'];
+			$shift_start = $row2['godzina_rozpoczecia'];
+			$shift_length = $row2['dlugosc_dyzuru'];
+			$shift_capacity = $row2['ilosc_miejsc'];
+			
+			$result4 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$id_shift' 
+			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
+			if (!$result4) throw new Exception($connection->error);
+			
+			$shift_busy = $result4->num_rows;
 		}
 		$connection->close();
 	}
@@ -92,6 +111,17 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			?>
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
@@ -116,6 +146,20 @@
 				<h3 class="d-flex flex-row justify-content-between my-3">
 					<div>Lista pracowników</div>
 				</h3>
+				<?php
+					echo "Id dyżuru: " . $id_shift;
+					echo "<br />";
+					echo "Nazwa dyżuru: " . $shift_name;
+					echo "<br />";
+					echo "Data dyżuru: " . $shift_date;
+					echo "<br />";
+					echo "Godzina rozpoczęcia: " . $shift_start;
+					echo "<br />";
+					echo "Długość dyżuru: " . $shift_length;
+					echo "<br />";
+					echo "Wolne miejsca: " . ($shift_capacity - $shift_busy) . "/" . $shift_capacity;
+					echo "<br />";
+				?>
 				<table class="table table-hover">
 				  <thead>
 					<tr align="center">
@@ -145,13 +189,6 @@
 				</table>
 			</div>
 		</div>
-	</div>	
-	
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-
+	</div>
 </body>
-
-
 </html>

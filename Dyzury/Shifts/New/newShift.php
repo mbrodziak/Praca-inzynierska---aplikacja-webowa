@@ -144,6 +144,17 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -251,20 +262,14 @@
 					}
 					?> 
 				  
-				  <button type="submit" class="btn btn-primary">DODAJ DYŻUR</button>
-				  
+				  <div>
+					<button type="submit" class="btn btn-primary">DODAJ DYŻUR</button>
+					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+				 </div>
 				</form>
-
-				<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelShift">ANULUJ</a>
-				
 			</div>
 		</div>
 	</div>
 	
 </body>	
-</html>
-
-</body>
-
-
 </html>

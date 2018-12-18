@@ -155,6 +155,17 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -275,18 +286,18 @@
 					}
 					?> 
 						
+				 <div>
 				  <button type="submit" class="btn btn-primary"
 					<?php 
 						echo !$can_edit ? "disabled" : "";
 					?>>ZATWIERDŹ</button>
 					
-				</form>
+					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+				</div>
 					
-				<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelEditShift">ANULUJ</a>
-				
+				</form>
 			</div>			
 		</div>
 	</div>
-	
 </body>	
 </html>

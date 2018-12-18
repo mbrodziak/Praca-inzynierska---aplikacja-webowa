@@ -109,6 +109,17 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -166,11 +177,11 @@
 					}
 					?> 	
 		
-					<button type="submit" class="btn btn-primary">EDYTUJ</button>			
+					<div>
+						<button type="submit" class="btn btn-primary">EDYTUJ</button>
+						<a href="/Employees/profil.php" class="btn btn-primary">ANULUJ</a>
+					</div>
 				</form>
-				
-				<a href="/Employees/profil.php" class="btn btn-primary" role="button" id="cancel">ANULUJ</a>
-				
 			</div>
 		</div>	
 	</div>

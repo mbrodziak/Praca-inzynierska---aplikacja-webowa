@@ -88,6 +88,17 @@
 			<li class="nav-item active">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			?>
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
@@ -116,13 +127,7 @@
 					{
 						echo "<a href='/Employees/New/newEmployee.php' class='btn btn-primary'>
 							DODAJ PRACOWNIKA <img src='/Assets/Icons/add.svg' />
-						</a>";
-						echo "<a href='/Employees/Permissions/givePermission.php' class='btn btn-primary'>
-							NADAJ UPRAWNIENIA <img src='/Assets/Icons/add.svg' />
-						</a>";
-						echo "<a href='/Employees/Permissions/receivePermission.php' class='btn btn-primary'>
-							ODBIERZ UPRAWNIENIA <img src='/Assets/Icons/remove.svg' />
-						</a>";						
+						</a>";					
 					}
 					?>
 				</h3>
@@ -165,9 +170,17 @@
 							if($_SESSION['admin'] == 1)
 							{
 								echo "
-								<td>
-	
-									<a href='/Employees/deleteEmployee.php?employee_id=" . $employee['id_pracownika'] . "' class='btn btn-danger btn-sm'
+								<td>"; 
+									if ($employee['admin'] == "Nie")  
+									echo "<a href='/Employees/Permissions/givePermission.php?employee_id=" . $employee['id_pracownika'] . "' 
+									class='btn btn-secondary btn-sm' data-toggle='tooltip' data-placement='bottom' title='Nadaj uprawnienia'>
+										<img src='/Assets/Icons/add.svg' />
+									</a>";									
+									else echo " <a href='/Employees/Permissions/receivePermission.php?employee_id=" . $employee['id_pracownika'] . "' 
+									class='btn btn-secondary btn-sm' data-toggle='tooltip' data-placement='bottom' title='Odbierz uprawnienia'>
+										<img src='/Assets/Icons/remove.svg' />
+									</a>";
+									echo " <a href='/Employees/deleteEmployee.php?employee_id=" . $employee['id_pracownika'] . "' class='btn btn-danger btn-sm'
 									data-toggle='tooltip' data-placement='bottom' title='Usuń pracownika'>
 										<img src='/Assets/Icons/delete.svg' />
 									</a>

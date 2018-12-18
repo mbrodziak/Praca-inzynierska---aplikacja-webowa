@@ -25,6 +25,7 @@
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['id']);
+			$can_edit = true;
 			
 			$login = $_SESSION['login'];
 			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
@@ -32,30 +33,51 @@
 			if (!$result) throw new Exception($connection->error);
 				
 			$row = $result->fetch_assoc();
-			$can_edit = true;
+	
+			$result2 = $connection->query("select id_dyzuru from dyzury_pracownikow where id = '$id'");
+			if (!$result2) throw new Exception($connection->error);
 			
-			if(isset($_POST['confirm_pass']))
+			$row2 = $result2->fetch_assoc();
+			$id_shift = $row2['id_dyzuru'];
+			
+			$result3 = $connection->query("select ilosc_miejsc from dyzury where id_dyzuru = '$id_shift'");
+			if (!$result3) throw new Exception($connection->error);
+			
+			$row3 = $result3->fetch_assoc();
+			$shift_capacity = $row3['ilosc_miejsc'];
+
+			$result4 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$id_shift' 
+			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
+			if (!$result4) throw new Exception($connection->error);
+			
+			$shift_busy = $result4->num_rows;
+			
+			if(($shift_capacity - $shift_busy) > "0")
 			{
-				$password = $_POST['confirm_pass'];
-				if(!empty($password))
+				if(isset($_POST['confirm_pass']))
 				{
-					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-					
-					else
-					{			
-						if($connection->query("update dyzury_pracownikow set potwierdzone = '1' where id = '$id'"))
-						{					
-							header('Location: /Shifts/Register/confirmEmployeeonShift.php');	
-						}
+					$password = $_POST['confirm_pass'];
+					if(!empty($password))
+					{
+						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+						
 						else
-						{
-							throw new Exception($connection->errno);
+						{			
+							if($connection->query("update dyzury_pracownikow set potwierdzone = '1' where id = '$id'"))
+							{					
+								header('Location: /Shifts/Register/applicationAdmin.php');	
+							}
+							else
+							{
+								throw new Exception($connection->errno);
+							}
+						
 						}
-					
 					}
-				}
-				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
-			}			
+					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+				}		
+			}
+			else $can_edit = false;
 		}								
 	$connection->close();
 	}
@@ -104,6 +126,17 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -125,12 +158,12 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Potwierdzanie zarejestrowania się na dyżur</div>
+					<div>Potwierdzanie zgloszenia</div>
 				</h3>
 				
 				<form method="post">
 					<div class="form-group">
-						<label>Potwierdź zarejestrowanie się na dyżur</label>
+						<label>Potwierdź zgloszenie</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
 					<?php 
 						echo !$can_edit ? "disabled" : "";
@@ -145,10 +178,17 @@
 					}
 					?> 
 					
+				  <div>
 					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
+					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+				  </div>
 				</form>	
-				
-				<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelDelete">ANULUJ</a>				
+
+				<?php 
+					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
+						Brak wolnych miejsc!
+					</div>";			
+				?>				
 			</div>
 		</div>
 	</div>

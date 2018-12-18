@@ -1,37 +1,49 @@
 <?php
 	session_start();
-	
+		
 	if (!isset($_SESSION['signed']))
 	{
 			header('Location: index.php');
 			exit(); 
 	}
 	
-	require_once __DIR__ . "/../connect.php";
+	require_once __DIR__ . "/../../connect.php";
+	
 	mysqli_report(MYSQLI_REPORT_STRICT);
+		
+	
+	$employee_on_shift = [];
 	
 	try
 	{
 		$connection = new mysqli($host, $db_user, $db_password, $db_name);
 		$connection -> query ('SET NAMES utf8');
 		$connection -> query ('SET CHARACTER_SET utf8_unicode_ci');
-	
+
 		if ($connection->connect_errno != 0)
 		{
 			throw new Exception(mysqli_connect_errno());
 		}
-		else 
+		else
 		{
-			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT * FROM pracownicy where login = '$login'");
-				
+			$id_employee = $_SESSION['id_employee'];
+			$result = $connection->query("select id, id_dyzuru, zarejestrowanie from dyzury_pracownikow where id_pracownika = '$id_employee' and potwierdzone = 0");
 			if (!$result) throw new Exception($connection->error);
+				
+			$num_rows = $result->num_rows;
+
+			for($i = 1; $i <= $num_rows; $i++)
+			{				
+				$row = $result->fetch_assoc();
+				$employee_on_shift[] = $row;
+				// $id_row[$i] = $row['id'];
+				// $id_dyzuru[$i] = $row['id_dyzuru'];
+				// $id_pracownika[$i] = $row['id_pracownika'];
+				// $zarejestrowanie[$i] = $row['zarejestrowanie'];
+				
+			}
 			
-			$row = $result->fetch_assoc();
-			
-			$_SESSION['birthday'] = $row['data_urodzenia'];
-			$_SESSION['email'] = $row['adres_email'];
-			$_SESSION['phone'] = $row['numer_telefonu'];
+
 		}
 		$connection->close();
 	}
@@ -49,23 +61,24 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
-	<title>Profil</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" />
+	<title>Zalogowany</title>
+
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	
-	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+	
 </head>
 
 <body>
+
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
-	  
+	 
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -85,11 +98,11 @@
 			if($_SESSION['admin'] == 1)
 			{
 				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+					<a class='nav-link active' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
 				</li>";
 			}
 			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+					<a class='nav-link active' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
 				</li>";
 			?>
 		</ul>
@@ -109,64 +122,51 @@
 	  </div>
 	</nav>
 	
+	
+	
 	<div class="container">
-		<h3 class="d-flex flex-row justify-content-between my-3">
-			<div>Profil pracownika</div>
-		</h3>
-		
-		<div class="row my-4">	
+		<div class="row">
 			<div class="col">
-				<img src="/Assets/Images/profil.jpg" alt="profil" class="img-thumbnail">
-			</div>
-			
-			<div class="col">
-				<?php
-					echo "Imie:  ";
-					echo "<br />";
-					echo "Nazwisko: ";
-					echo "<br />";
-					echo "Data urodzenia: ";
-					echo "<br />";
-					echo "Adres e-mail: ";
-					echo "<br />";
-					echo "Numer telefonu: ";;
-					echo "<br />";
-					echo "Login: ";
-					echo "<br />";
-					echo "Hasło: ";
-				?>
-			</div>
-			
-			<div class="col">
-				<?php
-					echo $_SESSION['name'];
-					echo "<br />";
-					echo $_SESSION['surname'];
-					echo "<br />";
-					echo $_SESSION['birthday'];
-					echo "
-						<a href='/Employees/Edit/changeBirthday.php' class='btn btn-color-white btn-sm' data-toggle='tooltip'  data-placement='left' title='Edytuj'>
-							EDYTUJ
-						</a>";
-					echo "<br />";
-					echo $_SESSION['email'];
-					echo "<br />";
-					echo $_SESSION['phone'];
-					echo "
-						<a href='/Employees/Edit/changePhone.php' class='btn btn-color-white btn-sm' >
-							EDYTUJ 
-						</a>";
-					echo "<br />";
-					echo $_SESSION['login'];
-					echo "<br />";
-					echo $_SESSION['pass'];	
-					echo "
-						<a href='/Employees/Edit/changePass.php' class='btn btn-color-white btn-sm' data-toggle='tooltip' data-placement='left' title='Edytuj'>
-							EDYTUJ
-						</a>";					
-				?>
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Lista zgłoszeń</div>
+				</h3>
+				<table class="table table-hover">
+				  <thead>
+					<tr align='center'>
+					  <th scope="col">#</th>
+					  <th scope="col">Identyfikator dyżuru</th>
+					  <th scope="col">Zgłoszenie</th>
+					  <th scope="col">Akcje</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<?php
+						foreach ($employee_on_shift as $employee_shift)
+						{
+							if($employee_shift['zarejestrowanie'] == 1) $employee_shift['zarejestrowanie'] = "Zarejestrowanie";
+							else $employee_shift['zarejestrowanie'] = "Wyrejestrowanie";
+							
+							echo " 
+							<tr align='center'>
+							  <th scope='row'>" . $employee_shift['id'] . "</th>
+							  <td>" . $employee_shift['id_dyzuru'] . "</td>
+							  <td>" . $employee_shift['zarejestrowanie'] . "</td>
+							  <td>
+				
+									<a href='/Shifts/withdrawApplication.php?id=" . $employee_shift['id'] . "' class='btn btn-secondary btn-sm' 
+									data-toggle='tooltip' data-placement='left' title='Wycofaj zgłoszenie'>
+										<img src='/Assets/Icons/remove.svg' />
+									</a>
+								
+								</td>
+							</tr>";
+						}
+					?>
+				  </tbody>
+				</table>
 			</div>
 		</div>
 	</div>
+		
 </body>
 </html>

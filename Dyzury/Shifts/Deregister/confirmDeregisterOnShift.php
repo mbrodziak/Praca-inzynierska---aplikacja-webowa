@@ -43,9 +43,9 @@
 					
 					else
 					{			
-						if($connection->query("update dyzury_pracownikow set potwierdzone = '1' where id = '$id'"))
+						if($connection->query("delete from dyzury_pracownikow where id = '$id'"))
 						{					
-							header('Location: /Shifts/Register/confirmEmployeeonShift.php');	
+							header('Location: /Shifts/Deregister/deregisterOnShift.php');	
 						}
 						else
 						{
@@ -104,6 +104,14 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
+			<?php 
+			if($_SESSION['admin'] == 1)
+			{
+				echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
+				</li>";
+			}
+			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -145,10 +153,11 @@
 					}
 					?> 
 					
-					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
-				</form>	
-				
-				<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelDelete">ANULUJ</a>				
+					<div>
+						<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
+						<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+					</div>
+				</form>				
 			</div>
 		</div>
 	</div>

@@ -42,18 +42,31 @@
 			//$result = $connection->query($query2);
 			if (!$result) throw new Exception($connection->error);
 			
-			$num_rows = $result->num_rows;
+			$result2 = $connection->query("select imie, nazwisko from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika and dyzury_pracownikow.potwierdzone = 0");
 			
-			for($i = 1; $i <= $num_rows; $i++)
+			if (!$result2) throw new Exception($connection->error);
+			
+			$result3 = $connection->query("select dyzury_pracownikow.id, dyzury_pracownikow.id_dyzuru, dyzury_pracownikow.zarejestrowanie, pracownicy.imie, pracownicy.nazwisko from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika and dyzury_pracownikow.potwierdzone = 0");
+			
+			if (!$result3) throw new Exception($connection->error);
+			
+			
+			$num_rows = $result->num_rows;
+			$num_rows2 = $result2->num_rows;
+			$num_rows3 = $result3->num_rows;
+			
+			for($i = 1; $i <= $num_rows3; $i++)
 			{				
-				$row = $result->fetch_assoc();
-				$employee_on_shift[] = $row;
+				$row3 = $result3->fetch_assoc();
+				$employee_on_shift[] = $row3;
 				// $id_row[$i] = $row['id'];
 				// $id_dyzuru[$i] = $row['id_dyzuru'];
 				// $id_pracownika[$i] = $row['id_pracownika'];
 				// $zarejestrowanie[$i] = $row['zarejestrowanie'];
 				
 			}
+			
+
 		}
 		$connection->close();
 	}
@@ -108,13 +121,12 @@
 			if($_SESSION['admin'] == 1)
 			{
 				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/confirmEmployeeonShift.php'>Zgłoszenia</a>
+					<a class='nav-link active' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
 				</li>";
 			}
 			else echo "<li class='nav-item'>
 					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
 				</li>";
-			}
 			?>
 		</ul>
 		
@@ -139,14 +151,14 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Lista dyżurów</div>
+					<div>Lista zgłoszeń</div>
 				</h3>
 				<table class="table table-hover">
 				  <thead>
 					<tr align='center'>
 					  <th scope="col">#</th>
-					  <th scope="col">Id dyzuru</th>
-					  <th scope="col">Id pracownika</th>
+					  <th scope="col">Identyfikator dyżuru</th>
+					  <th scope="col">Imie i nazwisko</th>
 					  <th scope="col">Zgłoszenie</th>
 					  <th scope="col">Akcje</th>
 					</tr>
@@ -155,21 +167,30 @@
 					<?php
 						foreach ($employee_on_shift as $employee_shift)
 						{
+							if($employee_shift['zarejestrowanie'] == 1) $employee_shift['zarejestrowanie'] = "Zarejestrowanie";
+							else $employee_shift['zarejestrowanie'] = "Wyrejestrowanie";
 							
 							echo " 
 							<tr align='center'>
 							  <th scope='row'>" . $employee_shift['id'] . "</th>
 							  <td>" . $employee_shift['id_dyzuru'] . "</td>
-							  <td>" . $employee_shift['id_pracownika'] . "</td>
+							  <td>" . $employee_shift['imie'] ." ". $employee_shift['nazwisko'] .  "</td>
 							  <td>" . $employee_shift['zarejestrowanie'] . "</td>
-							  <td><a href='/Shifts/Register/confirmRegisterOnShift.php?id=" . $employee_shift['id'] . "' class='btn btn-secondary btn-sm' 
-								data-toggle='tooltip' data-placement='left' title='Zarejestruj się na dyżur'>
-									<img src='/Assets/Icons/group_add.svg' />
-								</a>
+							  <td>";
+									echo "<a href='/Shifts/Register/confirmRegisterOnShift.php?id=" . $employee_shift['id'] . "' class='btn btn-secondary btn-sm' 
+									data-toggle='tooltip' data-placement='left' title='Potwierdź'>
+										<img src='/Assets/Icons/add.svg' />
+									</a>";
+				
+									// echo " <a href='/Shifts/Deregister/confirmDeregisterOnShift.php?id=" . $employee_shift['id'] . "' class='btn btn-secondary btn-sm' 
+									// data-toggle='tooltip' data-placement='left' title='Odrzuć'>
+										// <img src='/Assets/Icons/remove.svg' />
+									// </a>
+								
+								echo "</td>
 							</tr>";
 						}
 					?>
-					
 				  </tbody>
 				</table>
 			</div>

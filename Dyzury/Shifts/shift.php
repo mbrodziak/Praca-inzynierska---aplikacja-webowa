@@ -9,8 +9,8 @@
 	
 	require_once __DIR__ . "/../connect.php";
 	
-	$query = "SELECT  
-		dyzury.id_dyzuru, 
+	$query = "SELECT
+        dyzury.id_dyzuru, 
 		dyzury.tytul_dyzuru,
 		dyzury.godzina_rozpoczecia,
 		dyzury.data_dyzuru,
@@ -19,13 +19,21 @@
         (
         	SELECT  COUNT(*)
         	FROM    dyzury_pracownikow d
-        	WHERE   d.id_dyzuru = dyzury.id_dyzuru and d.potwierdzone = 1 or d.zarejestrowanie = 0
-        ) as zajete
+        	WHERE   (
+				d.id_dyzuru = dyzury.id_dyzuru AND (d.potwierdzone = 1 OR 
+				(d.zarejestrowanie = 0 AND d.potwierdzone = 0))
+			)
+        ) AS zajete,
+        (
+        	SELECT COUNT(d.id_pracownika)
+        	FROM dyzury_pracownikow d
+        	WHERE d.id_dyzuru = dyzury.id_dyzuru AND d.id_pracownika = " . $_SESSION['id_employee'] . "
+        ) AS jest_zarejestrowany  
 	FROM dyzury";
 	
+	
 	mysqli_report(MYSQLI_REPORT_STRICT);
-		
-
+	
 	$shifts = [];
 	
 	try
@@ -41,7 +49,7 @@
 		else
 		{
 			$result = $connection->query($query);
-			if (!$result) throw new Exception($connection->error);
+			if (!$result) throw new Exception($connection->error);			
 			
 			$num_rows = $result->num_rows;
 			
@@ -104,9 +112,13 @@
 			if($_SESSION['admin'] == 1)
 			{
 				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/confirmEmployeeonShift.php'>Potwierdzenia</a>
+					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
 				</li>";
 			}
+			else echo "<li class='nav-item'>
+					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
+				</li>";
+			
 			?>
 		</ul>
 		
@@ -167,16 +179,20 @@
 							  	<a href='/Employees/detailsShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
 								data-toggle='tooltip' data-placement='left' title='Szczegóły dyżuru'>
 									<img src='/Assets/Icons/search.svg' />
-								</a>
-								<a href='/Shifts/Register/registerOnShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
-								data-toggle='tooltip' data-placement='left' title='Zarejestruj się na dyżur'>
-									<img src='/Assets/Icons/group_add.svg' />
-								</a>
-								<a href='/Shifts/Deregister/deregisterOnShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
-								data-toggle='tooltip' data-placement='left' title='Wyrejestruj się z dyżuru'>
-									<img src='/Assets/Icons/person.svg' />
-								</a>";
-								
+								</a> " .
+								($shift['jest_zarejestrowany'] ?
+									"" : 
+									"<a href='/Shifts/Register/registerOnShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Zarejestruj się na dyżur'>
+										<img src='/Assets/Icons/add.svg' />
+									</a>") .
+								(!$shift['jest_zarejestrowany'] ?
+									"" : 
+									"<a href='/Shifts/Deregister/deregisterOnShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Wyrejestruj się z dyżuru'>
+										<img src='/Assets/Icons/remove.svg' />
+									</a>");
+																	
 								if($_SESSION['admin'] == 1)
 								{
 									echo "
