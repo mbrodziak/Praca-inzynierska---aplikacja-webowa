@@ -24,8 +24,22 @@
 		}
 		else
 		{
+			parse_str($_SERVER['QUERY_STRING'], $qs);
+			$q_sort_order = mysqli_real_escape_string($connection, (isset($qs['sort_order']) ? $qs['sort_order'] : "ASC"));
+			$q_sort_by = mysqli_real_escape_string($connection, (isset($qs['sort_by']) ? $qs['sort_by'] : "id_pracownika"));
+			//"name" jest aliasem na: "imie {order}, nazwisko {order}"
+			$sort_order = $q_sort_order;
+			$sort_by = ($q_sort_by === "name" ? "imie " . $sort_order . ", nazwisko" : $q_sort_by);
+								
 			$login = $_SESSION['login'];
-			$result = $connection->query("select * from pracownicy where login != '$login'");
+			
+			$query = "SELECT * 
+			FROM pracownicy 
+			WHERE login != '" . $login . "'
+			ORDER BY " . $sort_by . " " . $sort_order;
+			
+			//echo $query;
+			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
 			$num_rows = $result->num_rows;
 			
@@ -44,8 +58,6 @@
 		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
-	
-	
 ?>
 
 
@@ -71,7 +83,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -88,17 +100,7 @@
 			<li class="nav-item active">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
@@ -134,13 +136,70 @@
 				<table class="table table-hover">
 				  <thead>
 					<tr align="center">
-						<th scope="col">#</th>
-						<th scope="col">Imie i nazwisko</th>
-						<th scope="col">Data urodzenia</th>
-						<th scope="col">Adres e-mail</th>
-						<th scope="col">Numer telefonu</th>
-						<th scope="col">Login</th>
-						<th scope="col">Admin</th>
+						<th scope="col">
+							<a href="/Employees/cadre.php?sort_by=id_pracownika&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+								#
+								<?php 
+								if($q_sort_by === "id_pracownika" && $q_sort_order === "ASC")
+								{
+									echo "<img src='/Assets/Icons/up.svg' />";
+								}
+								
+								if($q_sort_by === "id_pracownika" && $q_sort_order === "DESC")
+								{
+									echo "<img src='/Assets/Icons/down.svg' />";
+								}
+								?>
+							</a>
+						</th>
+						<th scope="col">
+							<a href="/Employees/cadre.php?sort_by=name&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+								Imie i nazwisko
+								<?php 
+								if($q_sort_by === "name" && $q_sort_order === "ASC")
+								{
+									echo "<img src='/Assets/Icons/up.svg' />";
+								}
+								
+								if($q_sort_by === "name" && $q_sort_order === "DESC")
+								{
+									echo "<img src='/Assets/Icons/down.svg' />";
+								}
+								?>
+							</a>
+						</th>
+						<th scope="col">
+							<a href="/Employees/cadre.php?sort_by=adres_email&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+								Adres e-mail
+								<?php 
+								if($q_sort_by === "adres_email" && $q_sort_order === "ASC")
+								{
+									echo "<img src='/Assets/Icons/up.svg' />";
+								}
+								
+								if($q_sort_by === "adres_email" && $q_sort_order === "DESC")
+								{
+									echo "<img src='/Assets/Icons/down.svg' />";
+								}
+								?>
+							</a>
+						</th>
+						<th scope="col">
+							<a href="/Employees/cadre.php?sort_by=admin&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+								Admin
+								<?php 
+								if($q_sort_by === "admin" && $q_sort_order === "ASC")
+								{
+									echo "<img src='/Assets/Icons/up.svg' />";
+								}
+								
+								if($q_sort_by === "admin" && $q_sort_order === "DESC")
+								{
+									echo "<img src='/Assets/Icons/down.svg' />";
+								}
+								?>
+							</a>
+						</th>
 						<?php 
 						if($_SESSION['admin'] == 1)
 						{
@@ -161,16 +220,16 @@
 							<tr align='center'>
 							  <th scope='row'>" . $employee['id_pracownika'] . "</th>
 							  <td>" . $employee['imie'] . " " . $employee['nazwisko'] . "</td>
-							  <td>" . $employee['data_urodzenia'] . "</td>
 							  <td>" . $employee['adres_email'] . "</td>
-							  <td>" . $employee['numer_telefonu'] . "</td>
-							  <td>" . $employee['login'] . "</td>
-							  <td>" . $employee['admin'] . " </td>";
-							  
+							  <td>" . $employee['admin'] . "</td>
+							  <td>
+							  	<a href='/Employees/detailsEmployee.php?employee_id=" . $employee['id_pracownika'] . "' class='btn btn-secondary btn-sm' 
+								data-toggle='tooltip' data-placement='left' title='Szczegóły dyżuru'>
+									<img src='/Assets/Icons/search.svg' />
+								</a> ";
+								
 							if($_SESSION['admin'] == 1)
 							{
-								echo "
-								<td>"; 
 									if ($employee['admin'] == "Nie")  
 									echo "<a href='/Employees/Permissions/givePermission.php?employee_id=" . $employee['id_pracownika'] . "' 
 									class='btn btn-secondary btn-sm' data-toggle='tooltip' data-placement='bottom' title='Nadaj uprawnienia'>
@@ -179,6 +238,10 @@
 									else echo " <a href='/Employees/Permissions/receivePermission.php?employee_id=" . $employee['id_pracownika'] . "' 
 									class='btn btn-secondary btn-sm' data-toggle='tooltip' data-placement='bottom' title='Odbierz uprawnienia'>
 										<img src='/Assets/Icons/remove.svg' />
+									</a>";
+									echo "  <a href='/Employees/Edit/resetPass.php?employee_id=" . $employee['id_pracownika'] . "' class='btn btn-secondary btn-sm' 
+									data-toggle='tooltip' data-placement='bottom' title='Resetuj hasło'>
+										<img src='/Assets/Icons/edit.svg' />
 									</a>";
 									echo " <a href='/Employees/deleteEmployee.php?employee_id=" . $employee['id_pracownika'] . "' class='btn btn-danger btn-sm'
 									data-toggle='tooltip' data-placement='bottom' title='Usuń pracownika'>

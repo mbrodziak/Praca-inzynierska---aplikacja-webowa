@@ -7,10 +7,11 @@
 			exit(); 
 	}
 	
-	$next_week_date = date("Y-m-d", strtotime("+1 week"));
-	require_once __DIR__ . "/../../connect.php";	
+	require_once __DIR__ . "/../connect.php";
 	mysqli_report(MYSQLI_REPORT_STRICT);
-			
+		
+
+	$employees = [];
 	try
 	{
 		$connection = new mysqli($host, $db_user, $db_password, $db_name);
@@ -24,81 +25,43 @@
 		else
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
-			$id = mysqli_real_escape_string($connection, $qs['id']);
-			$can_edit = true;
+			$id = mysqli_real_escape_string($connection, $qs['employee_id']);
 			
-			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
+			$query = "select imie, nazwisko, data_urodzenia, numer_telefonu, login from pracownicy where id_pracownika = " . $id . "";
 			
+			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
-				
+			
 			$row = $result->fetch_assoc();
-	
-			$result2 = $connection->query("select id_dyzuru from dyzury_pracownikow where id = '$id'");
-			if (!$result2) throw new Exception($connection->error);
 			
-			$row2 = $result2->fetch_assoc();
-			$shift_id = $row2['id_dyzuru'];
-			echo "id_d" . " ". $shift_id;
+			$name = $row['imie'];						
+			$surname = $row['nazwisko'];						
+			$birthday = $row['data_urodzenia'];						
+			$phone = $row['numer_telefonu'];						
+			$login = $row['login'];						
 			
-			$result3 = $connection->query("select ilosc_miejsc from dyzury where id_dyzuru = '$shift_id'");
-			if (!$result3) throw new Exception($connection->error);
-			
-			$row3 = $result3->fetch_assoc();
-			$shift_capacity = $row3['ilosc_miejsc'];
-
-			$result4 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$shift_id' 
-			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
-			if (!$result4) throw new Exception($connection->error);
-			
-			$shift_busy = $result4->num_rows;
-			echo "busy"." ".$shift_busy;
-			echo "cap"." ".$shift_capacity;
-			
-			if(($shift_capacity - $shift_busy) > "0")
-			{
-				if(isset($_POST['confirm_pass']))
-				{
-					$password = $_POST['confirm_pass'];
-					if(!empty($password))
-					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-						
-						else
-						{			
-							if($connection->query("update dyzury_pracownikow set potwierdzone = '1' where id = '$id'"))
-							{					
-								header('Location: /Shifts/shift.php');	
-							}
-							else
-							{
-								throw new Exception($connection->errno);
-							}
-						
-						}
-					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
-				}		
-			}
-			else $can_edit = false;
-		}								
-	$connection->close();
+		}
+		$connection->close();
 	}
 	catch(Exception $e)
 	{
 		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
+	
+	
 ?>
+
+
 
 <!DOCTYPE HTML>
 <html lang ="pl">
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" >
-	<title>Potwierdzanie usunięcia dyżuru</title>
-
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport" >
+	<title>Zalogowany</title>
+	
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="/Assets/Style/style.css" type="text/css" />
@@ -106,6 +69,7 @@
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+	
 	
 </head>
 
@@ -131,7 +95,6 @@
 			</li>
 			
 		</ul>
-		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -147,46 +110,25 @@
 	  </div>
 	</nav>
 	
+	
+	
 	<div class="container">
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Potwierdzanie zgloszenia</div>
+					<div>Szczegóły pracownika - <?php echo $name . " " .$surname?></div>
 				</h3>
+				<?php
+					echo "Data urodzenia: " . $birthday;
+					echo "<br />";
+					echo "Numer telefonu: " . $phone;					
+					echo "<br />";
+					echo "Login: " . $login;
+				?>
 				
-				<form method="post">
-					<div class="form-group">
-						<label>Potwierdź zgloszenie</label>
-						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
-					<?php 
-						echo !$can_edit ? "disabled" : "";
-					?> />	
-					</div>
-					  
-					<?php
-					if (isset($_SESSION['e_password']))
-					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] . "</div>";
-						unset ($_SESSION['e_password']);
-					}
-					?> 
-					
-				  <div>
-					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
-					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
-				  </div>
-				</form>	
 
-				<?php 
-					echo "<br/>";
-					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
-						Brak wolnych miejsc!
-					</div>";			
-				?>				
 			</div>
 		</div>
 	</div>
 </body>
 </html>
-
-

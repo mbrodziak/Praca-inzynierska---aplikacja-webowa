@@ -40,6 +40,11 @@
 				
 					if (password_verify($pass, $row['haslo']))
 					{
+						for($i = 0; $i < strlen($pass); $i++)
+						{
+							$pass[$i] = "*";
+						}
+						$_SESSION['pass'] = $pass;
 						
 						$_SESSION['id_employee'] = $row['id_pracownika'];
 						$_SESSION['name'] = $row['imie'];
@@ -48,7 +53,7 @@
 						$_SESSION['email'] = $row['adres_email'];
 						$_SESSION['phone'] = $row['numer_telefonu'];
 						$_SESSION['login'] = $row['login'];
-						$_SESSION['pass'] = $row['haslo'];
+						$_SESSION['pass_hash'] = $row['haslo'];
 						$_SESSION['admin'] = $row['admin'];
 						
 						$connection->query("UPDATE pracownicy set ostatnie_logowanie = '$last_login' where login = '$login'");

@@ -16,6 +16,7 @@
 		$shift_name = $_POST['shift_name'];
 		$shift_date = $_POST['shift_date'];
 		$shift_start = $_POST['shift_start'];
+		$shift_date_end = $_POST['shift_date_end'];
 		$shift_length = $_POST['shift_length'];
 		$shift_capacity = $_POST['shift_capacity'];	
 		
@@ -45,6 +46,7 @@
 		$_SESSION['rem_shift_name'] = $shift_name;
 		$_SESSION['rem_shift_date'] = $shift_date;
 		$_SESSION['rem_shift_start'] = $shift_start;
+		$_SESSION['rem_shift_date_end'] = $shift_date_end;
 		$_SESSION['rem_shift_length'] = $shift_length;
 		$_SESSION['rem_shift_capacity'] = $shift_capacity;
 		
@@ -79,8 +81,8 @@
 						
 						else
 						{
-							if($connection->query("INSERT INTO dyzury values (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_length', 
-							'$shift_capacity')"))
+							if($connection->query("INSERT INTO dyzury values (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_date_end', 
+							'$shift_length', '$shift_capacity')"))
 							{
 								header('Location: /Shifts/shift.php');		
 							}
@@ -127,7 +129,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -144,17 +146,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -230,7 +222,18 @@
 				  </div>
 				  
 				  <div class="form-group">
-					<label>Długość dyżuru</label>
+					<label>Data zakończenia dyżuru</label>
+					<input type="date" class="form-control" name="shift_date_end" id="shift_date_end" placeholder="Data zakończenia" required min="<?php echo $next_week_date ?>" 
+					value="<?php
+					if (isset($_SESSION['rem_shift_date_end']))
+					{
+						echo $_SESSION['rem_shift_date_end'];
+						unset($_SESSION['rem_shift_date_end']);
+					}?>"/>
+				  </div>
+				  
+				  <div class="form-group">
+					<label>Długość dyżuru(dniówki)</label>
 					<input type="number" class="form-control" name="shift_length" id="shift_length" placeholder="Długość dyżuru (domyślnie 1h)" min="1" step="0.5" value="<?php
 					if (isset($_SESSION['rem_shift_length']))
 					{

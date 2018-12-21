@@ -25,6 +25,8 @@
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
+			$can_deregister = true;
+			$can_deregister_date = true;
 			
 			$login = $_SESSION['login'];
 			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
@@ -34,8 +36,6 @@
 			$row = $result->fetch_assoc();
 			$id_employee = $row['id_pracownika'];
 			$admin = $row['admin'];
-			$can_edit = true;
-			
 			
 			$result2 = $connection->query("SELECT * FROM dyzury_pracownikow where id_dyzuru = '$id' and id_pracownika = $id_employee");
 			
@@ -43,42 +43,37 @@
 			
 			$row2 = $result2->fetch_assoc();
 			$confirm = $row2['potwierdzone'];
-			$zarejestrowanie = $row2['zarejestrowanie'];
+			$register = $row2['zarejestrowanie'];
 			
+			$result3 = $connection->query("select data_dyzuru from dyzury where id_dyzuru = '$id'");
+			if (!$result3) throw new Exception($connection->error);
 			
-			if(isset($_POST['confirm_pass_submit']) && !empty($_POST['confirm_pass']))
+			$row3 = $result3->fetch_assoc();
+			$shift_date = $row3['data_dyzuru'];
+			
+			if($shift_date >= $next_week_date)
 			{
-				$password = $_POST['confirm_pass'];
-				
-				if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-				
-				else
-				{	
-					if($admin == 1)
-					{
-						if($connection->query("delete from dyzury_pracownikow where id_dyzuru = '$id' and id_pracownika = $id_employee"))
-						{					
-							header('Location: /Shifts/shift.php');	
-						}
-						else
+				if(isset($_POST['confirm_pass_submit']) && !empty($_POST['confirm_pass']))
+				{
+					$password = $_POST['confirm_pass'];
+					
+					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+					
+					else
+					{	
+						if($admin == 1)
 						{
-							throw new Exception($connection->errno);
+							if($connection->query("delete from dyzury_pracownikow where id_dyzuru = '$id' and id_pracownika = $id_employee"))
+							{					
+								header('Location: /Shifts/shift.php');	
+							}
+							else
+							{
+								throw new Exception($connection->errno);
+							}
 						}
-					}
-					else 
-					{		
-							// if($connection->query("delete from dyzury_pracownikow where id_dyzuru = '$id' and id_pracownika = '$id_employee'"))
-							// {					
-								// header('Location: /Shifts/shift.php');							
-							// }
-							// else
-							// {
-								// throw new Exception($connection->errno);
-							// }
-							
-						
-						if(($confirm) && ($zarejestrowanie))
-						{
+						else 
+						{		
 							if($connection->query("update dyzury_pracownikow set potwierdzone = '0', zarejestrowanie = '0' 
 							where id_dyzuru = '$id' and id_pracownika = '$id_employee'"))
 							{					
@@ -88,13 +83,15 @@
 							{
 								throw new Exception($connection->errno);
 							}
+							
 						}
 					}
-				}
-			}	
-			else if (isset($_POST['confirm_pass'])) $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
-			if(($confirm === "0") && ($zarejestrowanie === "0")) $can_edit = false;
-			if(($confirm === "0") && ($zarejestrowanie === "1")) $can_edit = false;
+				}	
+				else if (isset($_POST['confirm_pass'])) $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+				if(($confirm === "0") && ($register === "0")) $can_deregister = false;
+				if(($confirm === "0") && ($register === "1")) $can_deregister = false;
+			}
+			else $can_deregister_date = false;
 			
 		}								
 	$connection->close();
@@ -127,7 +124,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -144,17 +141,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -184,7 +171,8 @@
 						<label>Potwierdź zgloszenia wyrejestrowania/wyrejestrowanie się z dyżuru</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło "  
 					<?php 
-						echo !$can_edit ? "disabled" : "";
+						echo !$can_deregister ? "disabled" : "";
+						echo !$can_deregister_date ? "disabled" : "";
 					?>/>	
 					</div>
 					  
@@ -211,8 +199,15 @@
 				?> 
 				
 				<?php 
-					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
+					echo "<br />";
+					echo $can_deregister ? "" : "<div class='alert alert-danger' role='alert'>
 						Oczekiwanie na zaakceptowanie zgłoszenia!
+					</div>";			
+				?>				
+				
+				<?php 
+					echo $can_deregister_date ? "" : "<div class='alert alert-danger' role='alert'>
+						Nie można się już wyrejestrować!
 					</div>";			
 				?>
 			</div>

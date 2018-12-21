@@ -34,6 +34,7 @@
 				dyzury.godzina_rozpoczecia,
 				dyzury.data_dyzuru,
 				dyzury.dlugosc_dyzuru,
+				dyzury.data_zakonczenia,
 				dyzury.ilosc_miejsc,
 				(
 					SELECT  COUNT(*)
@@ -55,6 +56,7 @@
 				$shift_name = $_POST['shift_name'];
 				$shift_date = $_POST['shift_date'];
 				$shift_start = $_POST['shift_start'];
+				$shift_date_end = $_POST['shift_date_end'];
 				$shift_length = $_POST['shift_length'];
 				$shift_capacity = $_POST['shift_capacity'];	
 								
@@ -69,41 +71,24 @@
 					$_SESSION['e_shift_name'] = "Za długi tytuł!";
 				}
 				 
-				
 				$_SESSION['rem_shift_name'] = $shift_name;
 				$_SESSION['rem_shift_date'] = $shift_date;
 				$_SESSION['rem_shift_start'] = $shift_start;
+				$_SESSION['rem_shift_date_end'] = $shift_date_end;
 				$_SESSION['rem_shift_length'] = $shift_length;
 				$_SESSION['rem_shift_capacity'] = $shift_capacity;
 				
 				if($ready == true)
 				{
-					$loginn = $_SESSION['login'];
-					$result = $connection->query("SELECT haslo FROM pracownicy where login = '$loginn'");
-					
-					if (!$result) throw new Exception($connection->error);
-						
-					$row = $result->fetch_assoc();
-					$password = $_POST['confirm_pass'];
-				
-					if(!empty($password))
+					if($connection->query("update dyzury set tytul_dyzuru = '$shift_name', data_dyzuru = '$shift_date', 
+					godzina_rozpoczecia = '$shift_start', data_zakonczenia = '$shift_date_end', dlugosc_dyzuru = '$shift_length', ilosc_miejsc = '$shift_capacity' where id_dyzuru='$id'"))
 					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-						
-						else
-						{
-							if($connection->query("update dyzury set tytul_dyzuru = '$shift_name', data_dyzuru = '$shift_date', 
-							godzina_rozpoczecia = '$shift_start', dlugosc_dyzuru = '$shift_length', ilosc_miejsc = '$shift_capacity' where id_dyzuru='$id'"))
-							{
-								header('Location: /Shifts/shift.php');
-							}
-							else
-							{
-								throw new Exception($connection->errno);
-							}
-						}
+						header('Location: /Shifts/shift.php');
 					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+					else
+					{
+						throw new Exception($connection->errno);
+					}	
 				}
 			}		
 		}				
@@ -138,7 +123,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -155,17 +140,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -256,6 +231,21 @@
 				  </div>
 				  
 				  <div class="form-group">
+					<label>Data zakończenia dyżuru</label>
+					<input type="date" class="form-control" name="shift_date_end" id="shift_date_end" placeholder="Data zakończenia" required min="<?php echo $next_week_date ?>" 
+					value="<?php
+					if (isset($_SESSION['rem_shift_date_end']))
+					{
+						echo $_SESSION['rem_shift_date_end'];
+						unset($_SESSION['rem_shift_date_end']);
+					}
+					else echo $shift['data_zakonczenia'] ?>" 
+					<?php 
+						echo !$can_edit ? "disabled" : "";
+					?>/>
+				  </div>
+				  
+				  <div class="form-group">
 					<label>Ilość miejsc</label>
 					<input type="number" class="form-control" name="shift_capacity" id="shift_capacity" placeholder="Ilość miejsc" 
 					min="<?php echo $shift['zajete'] > 2 ? $shift['zajete'] : 2 ?>" value="<?php
@@ -269,31 +259,15 @@
 						echo !$can_edit ? "disabled" : "";
 					?>/>
 				  </div>
-				  
-				   <div class="form-group">
-					<label>Potwierdź edycje dyżuru</label>
-					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
-					<?php 
-						echo !$can_edit ? "disabled" : "";
-					?>/>	
-				  </div>
-				  
-					<?php
-					if (isset($_SESSION['e_password']))
-					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] .	"</div>";
-						unset ($_SESSION['e_password']);
-					}
-					?> 
 						
-				 <div>
-				  <button type="submit" class="btn btn-primary"
-					<?php 
-						echo !$can_edit ? "disabled" : "";
-					?>>ZATWIERDŹ</button>
-					
-					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
-				</div>
+					 <div>
+					  <button type="submit" class="btn btn-primary"
+						<?php 
+							echo !$can_edit ? "disabled" : "";
+						?>>ZATWIERDŹ</button>
+						
+						<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+					</div>
 					
 				</form>
 			</div>			

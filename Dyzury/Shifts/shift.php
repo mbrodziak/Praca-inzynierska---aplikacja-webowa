@@ -9,29 +9,6 @@
 	
 	require_once __DIR__ . "/../connect.php";
 	
-	$query = "SELECT
-        dyzury.id_dyzuru, 
-		dyzury.tytul_dyzuru,
-		dyzury.godzina_rozpoczecia,
-		dyzury.data_dyzuru,
-		dyzury.dlugosc_dyzuru,
-		dyzury.ilosc_miejsc,
-        (
-        	SELECT  COUNT(*)
-        	FROM    dyzury_pracownikow d
-        	WHERE   (
-				d.id_dyzuru = dyzury.id_dyzuru AND (d.potwierdzone = 1 OR 
-				(d.zarejestrowanie = 0 AND d.potwierdzone = 0))
-			)
-        ) AS zajete,
-        (
-        	SELECT COUNT(d.id_pracownika)
-        	FROM dyzury_pracownikow d
-        	WHERE d.id_dyzuru = dyzury.id_dyzuru AND d.id_pracownika = " . $_SESSION['id_employee'] . "
-        ) AS jest_zarejestrowany  
-	FROM dyzury";
-	
-	
 	mysqli_report(MYSQLI_REPORT_STRICT);
 	
 	$shifts = [];
@@ -48,6 +25,34 @@
 		}
 		else
 		{
+			parse_str($_SERVER['QUERY_STRING'], $qs);
+			$sort_order = mysqli_real_escape_string($connection, (isset($qs['sort_order']) ? $qs['sort_order'] : "ASC"));
+			$sort_by = mysqli_real_escape_string($connection, (isset($qs['sort_by']) ? $qs['sort_by'] : "id_dyzuru"));
+	
+			$query = "SELECT
+				dyzury.id_dyzuru, 
+				dyzury.tytul_dyzuru,
+				dyzury.godzina_rozpoczecia,
+				dyzury.data_dyzuru,
+				dyzury.dlugosc_dyzuru,
+				dyzury.data_zakonczenia,
+				dyzury.ilosc_miejsc,
+				(
+					SELECT  COUNT(*)
+					FROM    dyzury_pracownikow d
+					WHERE   (
+						d.id_dyzuru = dyzury.id_dyzuru AND (d.potwierdzone = 1 OR 
+						(d.zarejestrowanie = 0 AND d.potwierdzone = 0))
+					)
+				) AS zajete,
+				(
+					SELECT COUNT(d.id_pracownika)
+					FROM dyzury_pracownikow d
+					WHERE d.id_dyzuru = dyzury.id_dyzuru AND d.id_pracownika = " . $_SESSION['id_employee'] . "
+				) AS jest_zarejestrowany  
+			FROM dyzury
+			ORDER BY " . $sort_by . " " . $sort_order;
+	
 			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);			
 			
@@ -91,7 +96,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	 
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -108,18 +113,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
 			
-			?>
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -156,10 +150,86 @@
 				<table class="table table-hover">
 				  <thead>
 					<tr align='center'>
-					  <th scope="col">#</th>
-					  <th scope="col">Tytuł</th>
-					  <th scope="col">Rozpoczęcie</th>
-					  <th scope="col">Długość (h)</th>
+					  <th scope="col">
+						<a href="/Shifts/shift.php?sort_by=id_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							#
+							<?php 
+							if($sort_by === "id_dyzuru" && $sort_order === "ASC")
+							{
+								echo "<img src='/Assets/Icons/up.svg' />";
+							}
+							
+							if($sort_by === "id_dyzuru" && $sort_order === "DESC")
+							{
+								echo "<img src='/Assets/Icons/down.svg' />";
+							}
+							?>
+						</a>					  
+					  </th>
+					  <th scope="col">
+						<a href="/Shifts/shift.php?sort_by=tytul_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							Tytuł
+							<?php 
+							if($sort_by === "tytul_dyzuru" && $sort_order === "ASC")
+							{
+								echo "<img src='/Assets/Icons/up.svg' />";
+							}
+							
+							if($sort_by === "tytul_dyzuru" && $sort_order === "DESC")
+							{
+								echo "<img src='/Assets/Icons/down.svg' />";
+							}
+							?>
+						</a>
+					  </th>
+					  <th scope="col">
+						<a href="/Shifts/shift.php?sort_by=data_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							Rozpoczęcie
+							<?php 
+							if($sort_by === "data_dyzuru" && $sort_order === "ASC")
+							{
+								echo "<img src='/Assets/Icons/up.svg' />";
+							}
+							
+							if($sort_by === "data_dyzuru" && $sort_order === "DESC")
+							{
+								echo "<img src='/Assets/Icons/down.svg' />";
+							}
+							?>
+						</a>
+					  </th>
+					  <th scope="col">
+					   	<a href="/Shifts/shift.php?sort_by=data_zakonczenia&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							Data zakończenia
+							<?php 
+							if($sort_by === "data_zakonczenia" && $sort_order === "ASC")
+							{
+								echo "<img src='/Assets/Icons/up.svg' />";
+							}
+							
+							if($sort_by === "data_zakonczenia" && $sort_order === "DESC")
+							{
+								echo "<img src='/Assets/Icons/down.svg' />";
+							}
+							?>
+						</a>
+					  </th>
+					  <th scope="col">
+						<a href="/Shifts/shift.php?sort_by=dlugosc_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							Długość (h)
+							<?php 
+							if($sort_by === "dlugosc_dyzuru" && $sort_order === "ASC")
+							{
+								echo "<img src='/Assets/Icons/up.svg' />";
+							}
+							
+							if($sort_by === "dlugosc_dyzuru" && $sort_order === "DESC")
+							{
+								echo "<img src='/Assets/Icons/down.svg' />";
+							}
+							?>
+						</a>
+					  </th>
 					  <th scope="col">Wolne miejsca</th>
 					  <th scope="col">Akcje</th>
 					</tr>
@@ -173,6 +243,7 @@
 							  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
 							  <td>" . $shift['tytul_dyzuru'] . "</td>
 							  <td>" . $shift['data_dyzuru'] . " " . $shift['godzina_rozpoczecia'] . "</td>
+							  <td>" . $shift['data_zakonczenia'] . "</td>
 							  <td>" . $shift['dlugosc_dyzuru'] . "</td>
 							  <td>" . ($shift['ilosc_miejsc'] - $shift['zajete']) . "/" . $shift['ilosc_miejsc'] . "</td>
 							  <td> 

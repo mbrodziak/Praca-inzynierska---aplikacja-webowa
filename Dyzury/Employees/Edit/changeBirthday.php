@@ -34,31 +34,16 @@
 				else
 				{
 					$login = $_SESSION['login'];
-					$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
-					
-					if (!$result) throw new Exception($connection->error);
-						
-					$row = $result->fetch_assoc();
-					$password = $_POST['confirm_pass'];
-					
-					if(!empty($password))
-					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-						
-						else
-						{	
-							if ($connection->query("UPDATE pracownicy set data_urodzenia = '$new_birthday' where login = '$login'"))
-							{
 
-								header('Location: /Employees/profil.php');
-							}
-							else
-							{
-								throw new Exception($connection->error);
-							}
-						}
+					if ($connection->query("UPDATE pracownicy set data_urodzenia = '$new_birthday' where login = '$login'"))
+					{
+
+						header('Location: /Employees/profil.php');
 					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+					else
+					{
+						throw new Exception($connection->error);
+					}
 				}
 				$connection->close();
 			}	
@@ -93,7 +78,7 @@
 <body>
 	
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -110,17 +95,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -165,19 +140,6 @@
 					}
 					?>
 
-				  <div class="form-group">
-					<label>Potwierdź edycję</label>
-					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
-				  </div>
-				  
-					<?php
-					if (isset($_SESSION['e_password']))
-					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] .	"</div>";
-						unset ($_SESSION['e_password']);
-					}
-					?> 					
-				
 					<div>
 						<button type="submit" class="btn btn-primary">EDYTUJ</button>
 						<a href="/Employees/profil.php" class="btn btn-primary">ANULUJ</a>

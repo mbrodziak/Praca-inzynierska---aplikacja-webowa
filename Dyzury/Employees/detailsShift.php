@@ -28,8 +28,7 @@
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
 			
 			$query = "select * from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika 
-			and dyzury_pracownikow.id_dyzuru = '$id' and (dyzury_pracownikow.potwierdzone = 1 
-			OR (dyzury_pracownikow.potwierdzone = 0 and dyzury_pracownikow.zarejestrowanie = 0))";
+			and dyzury_pracownikow.id_dyzuru = '$id'";
 			
 			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
@@ -46,18 +45,18 @@
 			
 			$row2 = $result2->fetch_assoc();
 			
-			$id_shift = $row2['id_dyzuru'];
+			$shift_id = $row2['id_dyzuru'];
 			$shift_name = $row2['tytul_dyzuru'];
 			$shift_date = $row2['data_dyzuru'];
 			$shift_start = $row2['godzina_rozpoczecia'];
 			$shift_length = $row2['dlugosc_dyzuru'];
 			$shift_capacity = $row2['ilosc_miejsc'];
 			
-			$result4 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$id_shift' 
+			$result3 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$shift_id' 
 			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
-			if (!$result4) throw new Exception($connection->error);
+			if (!$result3) throw new Exception($connection->error);
 			
-			$shift_busy = $result4->num_rows;
+			$shift_busy = $result3->num_rows;
 		}
 		$connection->close();
 	}
@@ -94,7 +93,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -111,17 +110,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
@@ -147,7 +136,7 @@
 					<div>Lista pracowników</div>
 				</h3>
 				<?php
-					echo "Id dyżuru: " . $id_shift;
+					echo "Id dyżuru: " . $shift_id;
 					echo "<br />";
 					echo "Nazwa dyżuru: " . $shift_name;
 					echo "<br />";
@@ -159,13 +148,17 @@
 					echo "<br />";
 					echo "Wolne miejsca: " . ($shift_capacity - $shift_busy) . "/" . $shift_capacity;
 					echo "<br />";
+					echo "<br />";
 				?>
 				<table class="table table-hover">
 				  <thead>
 					<tr align="center">
 						<th scope="col" >#</th>
 						<th scope="col">Imie i nazwisko</th>
+						<th scope="col">Zgłoszenie</th>
+						<th scope="col">Potwierdzone</th>
 						<th scope="col">Admin</th>
+						<th scope="col">Akcje</th>
 					</tr>
 				  </thead>
 				  <tbody>
@@ -175,11 +168,69 @@
 							if($employee['admin'] == 1) $employee['admin'] = "Tak";
 							else $employee['admin'] = "Nie";
 							
+							if($employee['zarejestrowanie'] == 1) $employee['zarejestrowanie'] = "Zarejestrowanie";
+							else $employee['zarejestrowanie'] = "Wyrejestrowanie";
+							
+							if($employee['potwierdzone'] == 1) $employee['potwierdzone'] = "Tak";
+							else $employee['potwierdzone'] = "Nie";
+							
 							echo " 
 							<tr align='center'>
 							  <th scope='row'>" . $employee['id_pracownika'] . "</th>
 							  <td>" . $employee['imie'] . " " . $employee['nazwisko'] . "</td>
+							  <td>" . $employee['zarejestrowanie'] . " </td>
+							  <td>" . $employee['potwierdzone'] . " </td>
 							  <td>" . $employee['admin'] . " </td>
+							  <td>";
+								if(($employee['potwierdzone'] == "Tak") && ($_SESSION['id_employee'] == $employee['id_pracownika']))
+								{
+									echo "<a href='/Shifts/Deregister/deregisterOnShift.php?shift_id=" . $shift_id . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Wyrejestruj się z dyżuru'>
+										<img src='/Assets/Icons/remove.svg' />
+									</a>";
+								}							
+								if(($employee['potwierdzone'] == "Nie") && ($_SESSION['id_employee'] == $employee['id_pracownika']))
+								{
+									echo "<a href='/Shifts/withdrawApplication.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+									data-toggle='tooltip' data-placement='left' title='Wycofaj zgłoszenie'>
+										<img src='/Assets/Icons/remove.svg' />
+									</a>";
+								}
+								if($_SESSION['admin'])
+								{
+									if(($employee['potwierdzone'] == "Nie") && ($employee['zarejestrowanie'] == "Zarejestrowanie"))
+									{
+										echo "<a href='/Shifts/Register/confirmRegisterOnShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Potwierdź'>
+											<img src='/Assets/Icons/confirm.svg' />
+										</a>";
+										echo " <a href='/Shifts/Register/discardRegisterOnShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Odrzuć'>
+											<img src='/Assets/Icons/discard.svg' />
+									 </a> ";
+									}
+									if(($employee['potwierdzone'] == "Nie") && ($employee['zarejestrowanie'] == "Wyrejestrowanie"))
+									{
+										echo "<a href='/Shifts/Deregister/confirmDeregisterOnShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Potwierdź'>
+											<img src='/Assets/Icons/confirm.svg' />
+										</a>";
+										echo " <a href='/Shifts/Deregister/discardDeregisterOnShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Odrzuć'>
+											<img src='/Assets/Icons/discard.svg' />
+									 </a> ";
+									}
+									if(($employee['potwierdzone'] == "Tak") && ($employee['zarejestrowanie'] == "Zarejestrowanie") 
+										&& ($_SESSION['id_employee'] != $employee['id_pracownika']))
+									{
+										echo " <a href='/Shifts/Register/deleteEmployeeWithShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+										data-toggle='tooltip' data-placement='left' title='Usuń'>
+											<img src='/Assets/Icons/delete.svg' />
+									 </a> ";
+									}
+									
+								}	
+							  echo "</td>
 							</tr>		
 							";
 						}

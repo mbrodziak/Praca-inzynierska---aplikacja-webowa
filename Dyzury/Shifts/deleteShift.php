@@ -66,8 +66,6 @@
 			}
 			else
 			{
-				//$_SESSION['errorr'] = "<div class='alert alert-danger' role='alert'>Nie można usunąć dyżuru!</div>";
-				//header('Location: shift.php');
 				$can_edit = false;
 			}								
 		}
@@ -101,7 +99,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -118,17 +116,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -170,17 +158,18 @@
 					}
 					?> 
 					
-				<div>
-					<button type="submit" class="btn btn-primary"
-					<?php 
-						echo !$can_edit ? "disabled" : "";
-					?>>ZATWIERDŹ</button>
-					
-					<a href="/Shifts/shift.php" class="btn btn-primary" role="button" id="cancelDelete">ANULUJ</a>
-				</div>
+					<div>
+						<button type="submit" class="btn btn-primary"
+						<?php 
+							echo !$can_edit ? "disabled" : "";
+						?>>ZATWIERDŹ</button>
+						
+						<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
+					</div>
 				</form>	
 				
 				<?php 
+					echo "<br />";
 					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
 						Nie można usunąć dyżuru!
 					</div>";			

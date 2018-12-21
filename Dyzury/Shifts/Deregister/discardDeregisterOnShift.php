@@ -33,54 +33,29 @@
 			if (!$result) throw new Exception($connection->error);
 				
 			$row = $result->fetch_assoc();
-	
-			$result2 = $connection->query("select id_dyzuru from dyzury_pracownikow where id = '$id'");
-			if (!$result2) throw new Exception($connection->error);
 			
-			$row2 = $result2->fetch_assoc();
-			$shift_id = $row2['id_dyzuru'];
-			echo "id_d" . " ". $shift_id;
-			
-			$result3 = $connection->query("select ilosc_miejsc from dyzury where id_dyzuru = '$shift_id'");
-			if (!$result3) throw new Exception($connection->error);
-			
-			$row3 = $result3->fetch_assoc();
-			$shift_capacity = $row3['ilosc_miejsc'];
-
-			$result4 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$shift_id' 
-			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
-			if (!$result4) throw new Exception($connection->error);
-			
-			$shift_busy = $result4->num_rows;
-			echo "busy"." ".$shift_busy;
-			echo "cap"." ".$shift_capacity;
-			
-			if(($shift_capacity - $shift_busy) > "0")
+			if(isset($_POST['confirm_pass']))
 			{
-				if(isset($_POST['confirm_pass']))
+				$password = $_POST['confirm_pass'];
+				if(!empty($password))
 				{
-					$password = $_POST['confirm_pass'];
-					if(!empty($password))
-					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-						
-						else
-						{			
-							if($connection->query("update dyzury_pracownikow set potwierdzone = '1' where id = '$id'"))
-							{					
-								header('Location: /Shifts/shift.php');	
-							}
-							else
-							{
-								throw new Exception($connection->errno);
-							}
-						
+					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+					
+					else
+					{			
+						if($connection->query("update dyzury_pracownikow set potwierdzone = '1', zarejestrowanie = '1' where id = '$id'"))
+						{					
+							header('Location: /Shifts/shift.php');	
 						}
+						else
+						{
+							throw new Exception($connection->errno);
+						}
+					
 					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
-				}		
+				}
+				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";		
 			}
-			else $can_edit = false;
 		}								
 	$connection->close();
 	}
@@ -151,12 +126,12 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Potwierdzanie zgloszenia</div>
+					<div>Odrzucanie zgloszenia</div>
 				</h3>
 				
 				<form method="post">
 					<div class="form-group">
-						<label>Potwierdź zgloszenie</label>
+						<label>Odrzuć zgloszenie</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
 					<?php 
 						echo !$can_edit ? "disabled" : "";
@@ -175,14 +150,7 @@
 					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
 					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
 				  </div>
-				</form>	
-
-				<?php 
-					echo "<br/>";
-					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
-						Brak wolnych miejsc!
-					</div>";			
-				?>				
+				</form>					
 			</div>
 		</div>
 	</div>

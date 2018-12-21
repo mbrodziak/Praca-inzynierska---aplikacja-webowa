@@ -6,8 +6,64 @@
 			header('Location: index.php');
 			exit(); 
 	}
+	
+	require_once __DIR__ . "/connect.php";
+	mysqli_report(MYSQLI_REPORT_STRICT);
+	
+	$confirmed_shift = [];
+	$registered_shift = [];
+	
+	try
+	{
+		$connection = new mysqli($host, $db_user, $db_password, $db_name);
+		$connection -> query ('SET NAMES utf8');
+		$connection -> query ('SET CHARACTER_SET utf8_unicode_ci');
+	
+		if ($connection->connect_errno != 0)
+		{
+			throw new Exception(mysqli_connect_errno());
+		}
+		else 
+		{
+			$id = $_SESSION['id_employee'];
+			$query = "select dyzury.id_dyzuru, dyzury.tytul_dyzuru, dyzury.data_dyzuru 
+			from dyzury inner join dyzury_pracownikow where dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru 
+			and dyzury_pracownikow.id_pracownika = '$id' and potwierdzone = '1' and zarejestrowanie = '1' order by data_dyzuru desc";			
+			
+			$query2 = "select dyzury.id_dyzuru, dyzury.tytul_dyzuru, dyzury.data_dyzuru 
+			from dyzury inner join dyzury_pracownikow where dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru 
+			and dyzury_pracownikow.id_pracownika = '$id' and potwierdzone = '0' and zarejestrowanie = '1' order by data_dyzuru desc";
+			
+			$result = $connection->query($query);
+			if (!$result) throw new Exception($connection->error);			
+			
+			$result2 = $connection->query($query2);
+			if (!$result2) throw new Exception($connection->error);
+			
+			$num_rows = $result->num_rows;
+			$num_rows2 = $result2->num_rows;
+			
+			for($i = 1; $i <= $num_rows; $i++)
+			{
+				$row = $result->fetch_assoc();
+				$confirmed_shift[] = $row;
+			}			
+			
+			for($i = 1; $i <= $num_rows2; $i++)
+			{
+				$row2 = $result2->fetch_assoc();
+				$registered_shift[] = $row2;
+			}
+		}
+	$connection->close();
+	}
+	catch(Exception $e)
+	{
+		echo '<span style="color:red;">Błąd serwera!</span>';
+		echo '<br />Informacja developerska: '.$e;
+	}
 ?>
-
+	
 
 
 <!DOCTYPE HTML>
@@ -30,7 +86,7 @@
 
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -47,17 +103,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -75,17 +121,71 @@
 	  </div>
 	</nav>
 	
-	<div class="container">
+	<div class="container my-3">
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Strona główna</div>
+					<div>Confirmed shifts</div>
 				</h3>
+				
+				<table class="table table-hover">	
+				  <thead>
+					<tr align="center">
+						<th scope="col" >#</th>
+						<th scope="col">Tytuł</th>
+						<th scope="col">Data dyzuru</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<?php
+						foreach ($confirmed_shift as $shift)
+						{
+							echo " 
+							<tr align='center'>
+							  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
+							  <td>" . $shift['tytul_dyzuru'] . "</td>
+							  <td>" . $shift['data_dyzuru'] . "</td>
+							</tr>";
+						}
+					?>
+				  </tbody>
+				</table>
+		
+				  
+				<?php
+					if($_SESSION['admin'] == 0)
+					{ 
+					  echo 
+						"<h3 class='d-flex flex-row justify-content-between my-3'>
+							<div>Registered shifts</div>
+						</h3>
+						
+						<table class='table table-hover'>
+						  <thead>
+							<tr align='center'>
+								<th scope='col' >#</th>
+								<th scope='col'>Tytuł</th>
+								<th scope='col'>Data dyzuru</th>
+							</tr>
+						  </thead>
+						  <tbody>";
+							
+								foreach ($registered_shift as $shift2)
+								{
+									echo " 
+									<tr align='center'>
+									  <th scope='row'>" . $shift2['id_dyzuru'] . "</th>
+									  <td>" . $shift2['tytul_dyzuru'] . "</td>
+									  <td>" . $shift2['data_dyzuru'] . "</td>
+									</tr>";
+								}
+						echo "</tbody>
+						</table>";
+					}
+				?>
 			</div>
 		</div>
 	</div>
 		
 </body>
-
-
 </html>

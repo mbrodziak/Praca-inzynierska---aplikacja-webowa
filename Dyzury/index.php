@@ -29,6 +29,9 @@
 
 </head>
 <body>
+	<div id="nameWebApplication">
+		NA61 HW Shift 
+	</div>
 	<div id="loginPanel">
 		<div class="container">
 			<div class="row">

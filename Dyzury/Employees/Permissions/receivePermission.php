@@ -23,69 +23,19 @@
 		}
 		else
 		{
-			// $loginn = $_SESSION['login'];
-			// $result = $connection->query("select * from pracownicy where admin = 1 and login != '$loginn'");
-			
-			// if (!$result) throw new Exception($connection->error);
-			
-			// $num_rows = $result->num_rows;
-			
-			// for($i = 1; $i <= $num_rows; $i++)
-			// {	
-				// $row = $result->fetch_assoc();
-				
-				// $lp[$i] = $row['id_pracownika']; 
-				// $name[$i] = $row['imie'];
-				// $surname[$i] = $row['nazwisko'];
-				// $birthday[$i] = $row['data_urodzenia'];
-				// $email[$i] = $row['adres_email'];
-				// $phone[$i] = $row['numer_telefonu'];
-				// $login[$i] = $row['login'];
-				// $admin[$i] = $row['admin'];				
-			// }
-			
-			// if(isset($_POST['employees']))
-			// {			
-				// $employees = $_POST['employees'];
-				
-				// $login = $_SESSION['login'];
-				// $result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
-				
-				// if (!$result) throw new Exception($connection->error);
-					
-				// $row = $result->fetch_assoc();
 			
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['employee_id']);
 			
-			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
-			
-			if (!$result) throw new Exception($connection->error);
-				
-			$row = $result->fetch_assoc();
-			
-			if(isset($_POST['confirm_pass']))
-			{	
-				$password = $_POST['confirm_pass'];			
-				if(!empty($password))
-				{
-					if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-					
-					else
-					{
-						if($connection->query("UPDATE pracownicy set admin = '0' where id_pracownika = '$id'"))
-						{
-							header('Location: /Employees/cadre.php');
-						}
-						else
-						{
-							throw new Exception($connection->error);
-						}
-					}
-				}
-				else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+			if($connection->query("UPDATE pracownicy set admin = '0' where id_pracownika = '$id'"))
+			{
+				header('Location: /Employees/cadre.php');
 			}
+			else
+			{
+				throw new Exception($connection->error);
+			}
+					
 		}
 		$connection->close();
 	}
@@ -122,7 +72,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -139,17 +89,7 @@
 			<li class="nav-item active">
 				<a class="nav-link" href="/Employees/cadre.php" >Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
@@ -174,31 +114,7 @@
 				</h3>
 				<form method="post">
 				  
-					<?php
-						// for($i = 1; $i <= $num_rows; $i++)
-						// {
-							// echo "<div class='form-group form-check'>
-								// <label><input type='checkbox' class='form-check-input' name='employees[]' value='";
-							// echo $login[$i];
-							// echo "'>";
-							// echo "  ".$name[$i]." ".$surname[$i]."<br />";
-							// echo "</label>";
-							// echo "</div>";
-						// }
-					?>
-					
-				  <div class="form-group">
-					<label>Potwierdź odebranie uprawnień</label>
-					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
-				  </div>
-				  
-					<?php
-					if (isset($_SESSION['e_password']))
-					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] . "</div>";
-						unset ($_SESSION['e_password']);
-					}
-					?> 
+				
 					
 					<div>
 					 <button type="submit" class="btn btn-primary">ODBIERZ</button>

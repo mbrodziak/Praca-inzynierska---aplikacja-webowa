@@ -25,6 +25,7 @@
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['id']);
+			$can_edit = true;
 			
 			$login = $_SESSION['login'];
 			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
@@ -32,7 +33,7 @@
 			if (!$result) throw new Exception($connection->error);
 				
 			$row = $result->fetch_assoc();
-			$can_edit = true;
+			
 			
 			if(isset($_POST['confirm_pass']))
 			{
@@ -45,7 +46,7 @@
 					{			
 						if($connection->query("delete from dyzury_pracownikow where id = '$id'"))
 						{					
-							header('Location: /Shifts/Deregister/deregisterOnShift.php');	
+							header('Location: /Shifts/shift.php');	
 						}
 						else
 						{
@@ -87,7 +88,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -104,14 +105,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -133,12 +127,12 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-flex flex-row justify-content-between my-3">
-					<div>Potwierdzanie zarejestrowania się na dyżur</div>
+					<div>Potwierdzanie wyrejestrowania z dyżuru</div>
 				</h3>
 				
 				<form method="post">
 					<div class="form-group">
-						<label>Potwierdź zarejestrowanie się na dyżur</label>
+						<label>Potwierdź wyrejestrowanie z dyżuru</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
 					<?php 
 						echo !$can_edit ? "disabled" : "";

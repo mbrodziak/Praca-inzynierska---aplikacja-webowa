@@ -7,70 +7,37 @@ body
 #loginPanel
 {
 	position: relative;
-	top: 200px;
+	top: 100px;
 	background-color: #dddddd;
 	padding: 20px;
 }
 
-#cancel
+#nameWebApplication
 {
 	position: relative;
-	left: 94px;
-	top: -38px;
+	text-align: center;
+	top: 50px;
+	padding: 20px;
+	font-size: 60px;
 }
 
-#cancelPass
+a
 {
-	position: relative;
-	left: 142px;
-	top: -37px;
+	color: #000000;
+	text-decoration: none;
 }
 
-#cancelEmployee
+a:hover
 {
-	position: relative;
-	left: 203px;
-	top: -38px;
+	color: #000000;
 }
 
-#cancelShift
+a:focus
 {
-	position: relative;
-	left: 147px;
-	top: -37px;
-}
-
-#cancelGive
-{
-	position: relative;
-	left: 89px;
-	top: -53px;
-}
-
-#cancelReceive
-{
-	position: relative;
-	left: 105px;
-	top: -53px;
-}
-
-#cancelEditShift
-{
-	position: relative;
-	left: 128px;
-	top: -37px;
-}
-
-#cancelDelete
-{
-	position: relative;
-	left: 128px;
-	top: -37px;
+	color: #000000;
 }
 
 #confirm_pass
 {
 	background-color: #dddddd;
 }
-
-

@@ -81,7 +81,7 @@
 		
 		if($phone_number == NULL)
 		{
-			$phone_number = "000000000";
+			$phone_number = "+00 000000000";
 		}
 		
 		$phone = (string) $phone_number;
@@ -137,32 +137,15 @@
 				
 				if ($ready == true)
 				{
-					$loginn = $_SESSION['login'];
-					$result = $connection->query("SELECT haslo FROM pracownicy where login = '$loginn'");
-					
-					if (!$result) throw new Exception($connection->error);
-						
-					$row = $result->fetch_assoc();
-					$password = $_POST['confirm_pass'];
-				
-					if(!empty($password))
+					if ($connection->query("INSERT INTO pracownicy VALUES (NULL, '$name', '$surname', '$birthday', '$email', '$phone', '$login', 
+					'$hash_pass', '$admin2', '0000-00-00 00:00:00')"))
 					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-						
-						else
-						{
-							if ($connection->query("INSERT INTO pracownicy VALUES (NULL, '$name', '$surname', '$birthday', '$email', '$phone', '$login', 
-							'$hash_pass', '$admin2', '0000-00-00 00:00:00')"))
-							{
-								header('Location: /Employees/cadre.php');
-							}	
-							else
-							{
-								throw new Exception($connection->error);
-							}
-						}
+						header('Location: /Employees/cadre.php');
+					}	
+					else
+					{
+						throw new Exception($connection->error);
 					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
 				}
 				$connection->close();
 			}
@@ -197,7 +180,7 @@
 <body>
 	
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -214,17 +197,7 @@
 			<li class="nav-item active">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -317,7 +290,7 @@
 				  
 				  <div class="form-group">
 					<label>Numer telefonu</label>
-					<input type="tel" class="form-control" name="phone_number" id="phone_number" placeholder="Numer telefonu (opcjonalnie)" pattern="[0-9]{9}" value="<?php
+					<input type="tel" class="form-control" name="phone_number" id="phone_number" placeholder="Numer telefonu (opcjonalnie)" pattern="[+][0-9]{2} [0-9]{9}" value="<?php
 					if (isset($_SESSION['rem_phone']))
 					{
 						echo $_SESSION['rem_phone'];
@@ -369,20 +342,6 @@
 					}?>/> 
 					<label> Admin </label> 
 				  </div>
-				  
-				  					
-				  <div class="form-group">
-					<label>Potwierdź dodanie pracownika</label>
-					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	
-				  </div>
-				  
-					<?php
-					if (isset($_SESSION['e_password']))
-					{
-						echo "<div class='alert alert-danger' role='alert'>" . $_SESSION['e_password'] .	"</div>";
-						unset ($_SESSION['e_password']);
-					}
-					?> 
 				  
 				  <div>
 					<button type="submit" class="btn btn-primary">DODAJ PRACOWNIKA</button>	

@@ -106,14 +106,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/confirmEmployeeonShift.php'>Zgłoszenia</a>
-				</li>";
-			}
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">

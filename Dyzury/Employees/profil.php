@@ -64,7 +64,7 @@
 
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -81,17 +81,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -145,7 +135,7 @@
 					echo "<br />";
 					echo $_SESSION['birthday'];
 					echo "
-						<a href='/Employees/Edit/changeBirthday.php' class='btn btn-color-white btn-sm' data-toggle='tooltip'  data-placement='left' title='Edytuj'>
+						<a href='/Employees/Edit/changeBirthday.php' class='btn btn-color-white btn-sm'>
 							EDYTUJ
 						</a>";
 					echo "<br />";
@@ -161,7 +151,7 @@
 					echo "<br />";
 					echo $_SESSION['pass'];	
 					echo "
-						<a href='/Employees/Edit/changePass.php' class='btn btn-color-white btn-sm' data-toggle='tooltip' data-placement='left' title='Edytuj'>
+						<a href='/Employees/Edit/changePass.php' class='btn btn-color-white btn-sm'>
 							EDYTUJ
 						</a>";					
 				?>

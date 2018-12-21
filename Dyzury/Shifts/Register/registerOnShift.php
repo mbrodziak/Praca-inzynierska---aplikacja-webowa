@@ -7,7 +7,11 @@
 			exit(); 
 	}
 	
-	$next_week_date = date("Y-m-d", strtotime("+1 week"));
+	//$next_week_date = date("Y-m-d", strtotime("+1 week"));
+	$tommorrow = date("Y-m-d", strtotime("+1 day"));
+	$yesterday = date("Y-m-d", strtotime("-1 day"));
+	$today = date("Y-m-d");
+	//echo $tommorrow;
 	require_once __DIR__ . "/../../connect.php";	
 	mysqli_report(MYSQLI_REPORT_STRICT);
 				
@@ -27,71 +31,101 @@
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
+			$can_register = true;
+			$can_register_date = true;
+			$can_register_date2 = true;
 			
-			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
+			$employee_id = $_SESSION['id_employee'];
+			$result = $connection->query("SELECT haslo, admin FROM pracownicy where id_pracownika = '$employee_id'");
 			
-			
-			if (!$result) throw new Exception($connection->error);
-				
+			if (!$result) throw new Exception($connection->error);	
 			$row = $result->fetch_assoc();
-			$can_edit = true;
-	
-			$result2 = $connection->query("select ilosc_miejsc from dyzury where id_dyzuru = '$id'");
+			
+			$result2 = $connection->query("select data_dyzuru, ilosc_miejsc from dyzury where id_dyzuru = '$id'");
 			if (!$result2) throw new Exception($connection->error);
 			
 			$row2 = $result2->fetch_assoc();
+			$shift_date = $row2['data_dyzuru'];
 			$shift_capacity = $row2['ilosc_miejsc'];
 			
-			$result3 = $connection->query("select id_dyzuru, potwierdzone, zarejestrowanie from dyzury_pracownikow where id = '$id' 
+		
+			$result3 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$id' 
 			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
-			
 			if (!$result3) throw new Exception($connection->error);
+			
 			$shift_busy = $result3->num_rows;
 			
-			if(($shift_capacity - $shift_busy) > "0")
+			$result4 = $connection->query("select data_dyzuru, data_zakonczenia from dyzury inner join dyzury_pracownikow 
+			where dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru and id_pracownika = '$employee_id'");
+			if (!$result4) throw new Exception($connection->error);
+			
+			$num_rows4 = $result4->num_rows;
+			for($i = 0; $i < $num_rows4; $i++)
 			{
-				if(isset($_POST['confirm_pass']))
+				$row4 = $result4->fetch_assoc();
+				$shift_date_emp[$i] = $row4['data_dyzuru'];
+				$shift_date_end_emp[$i] = $row4['data_zakonczenia'];
+			}			
+			
+			for($i = 0; $i < $num_rows4; $i++)
+			{
+				// echo "R". " " . $shift_date_emp[$i] . "<br />";
+				// echo "Z". " " . $shift_date_end_emp[$i]  . "<br />";
+				// echo "DD". " " . $shift_date . "<br />";
+				if(($shift_date > $shift_date_emp[$i] ) && ( $shift_date <= $shift_date_end_emp[$i]))
 				{
-					$password = $_POST['confirm_pass'];
-					if(!empty($password))
+					$can_register_date2 = false;
+				}
+				else $can_register_date2 = true;
+			} 
+			
+			if($shift_date > $today)
+			{ 
+				if(($shift_capacity - $shift_busy) > "0")
+				{
+					if(isset($_POST['confirm_pass']))
 					{
-						if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
-						
-						else
-						{	
-							$id_employee = $row['id_pracownika'];
-							$admin = $row['admin'];
-							if($admin == 1)
-							{
-								if($connection->query("insert into dyzury_pracownikow values (NULL, '$id', '$id_employee', 1, 1)"))
-								{					
-									header('Location: /Shifts/shift.php');	
-								}
-								else
-								{
-									throw new Exception($connection->errno);
-								}
-							}
+						$password = $_POST['confirm_pass'];
+						if(!empty($password))
+						{
+							if(!password_verify($password, $row['haslo'])) $_SESSION['e_password'] = "Błędne hasło!";
+							
 							else
-							{ 
-								
-								if($connection->query("insert into dyzury_pracownikow values (NULL, '$id', '$id_employee', 0, 1)"))
-								{					
-									header('Location: /Shifts/shift.php');	
+							{	
+								$id_employee = $row['id_pracownika'];
+								$admin = $row['admin'];
+								if($admin == 1)
+								{
+									if($connection->query("insert into dyzury_pracownikow values (NULL, '$id', '$id_employee', 1, 1)"))
+									{					
+										header('Location: /Shifts/shift.php');	
+									}
+									else
+									{
+										throw new Exception($connection->errno);
+									}
 								}
 								else
-								{
-									throw new Exception($connection->errno);
+								{ 
+									
+									if($connection->query("insert into dyzury_pracownikow values (NULL, '$id', '$id_employee', 0, 1)"))
+									{					
+										header('Location: /Shifts/shift.php');	
+									}
+									else
+									{
+										throw new Exception($connection->errno);
+									}
 								}
-							}
 
+							}
 						}
-					}
-					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
-				}			
+						else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
+					}			
+				}
+				else $can_register = false;
 			}
-			else $can_edit = false;
+			else $can_register_date = false;
 		}								
 	$connection->close();
 	}
@@ -123,7 +157,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="/">Nazwa aplikacji</a>
+	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
 	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
 			<span class="navbar-toggler-icon"></span>
@@ -140,17 +174,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/Employees/cadre.php">Zarządzaj pracownikami</a>
 			</li>
-			<?php 
-			if($_SESSION['admin'] == 1)
-			{
-				echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationAdmin.php'>Zgłoszenia</a>
-				</li>";
-			}
-			else echo "<li class='nav-item'>
-					<a class='nav-link' href='/Shifts/Register/applicationNoAdmin.php'>Zgłoszenia</a>
-				</li>";
-			?>
+			
 		</ul>
 		
 		<ul class="navbar-nav">
@@ -180,7 +204,7 @@
 						<label>Potwierdź zgloszenie zarejestrowania/zarejestrowanie się na dyżur</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
 					<?php 
-						echo !$can_edit ? "disabled" : "";
+						echo !$can_register ? "disabled" : "";
 					?> />	
 					</div>
 					  
@@ -199,8 +223,21 @@
 				</form>
 
 				<?php 
-					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
+					echo "<br />";
+					echo $can_register ? "" : "<div class='alert alert-danger' role='alert'>
 						Brak wolnych miejsc!
+					</div>";			
+				?>				
+				
+				<?php 
+					echo $can_register_date ? "" : "<div class='alert alert-danger' role='alert'>
+						Nie można już zarejestrować na dyżur!
+					</div>";			
+				?>
+				
+				<?php 
+					echo $can_register_date2 ? "" : "<div class='alert alert-danger' role='alert'>
+						Nie możesz zarejestrować się na ten dyżur!
 					</div>";			
 				?>
 				
