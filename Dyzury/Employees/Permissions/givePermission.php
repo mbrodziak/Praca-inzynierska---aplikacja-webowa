@@ -26,7 +26,7 @@
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['employee_id']);
 
-			if($connection->query("UPDATE pracownicy set admin = '1' where id_pracownika = '$id'"))
+			if($connection->query("UPDATE pracownicy SET admin = '1' WHERE id_pracownika = '$id'"))
 			{
 				header('Location: /Employees/cadre.php');
 			}
@@ -70,7 +70,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -89,10 +89,10 @@
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -109,20 +109,7 @@
 					<div>Nadaj uprawnienia</div>
 				</h3>
 				<form method="post">
-				  
-					<?php
-						// for($i = 1; $i <= $num_rows; $i++)
-						// {
-							// echo "<div class='form-group form-check'>
-								// <label><input type='checkbox' class='form-check-input' name='employees[]' value='";
-							// echo $login[$i];
-							// echo "'>";
-							// echo "  ".$name[$i]." ".$surname[$i]."<br />";
-							// echo "</label>";
-							// echo "</div>";
-						// }
-					?>
-					
+				 	
 				  <div class="form-group">
 					<label id="confirm">Potwierdź nadanie uprawnień</label>
 					<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" />	

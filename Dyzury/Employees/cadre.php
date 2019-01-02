@@ -47,15 +47,14 @@
 			{
 				
 				$row = $result->fetch_assoc();
-				$employees[] = $row;
-				
+				$employees[] = $row;	
 			}
 		}
 		$connection->close();
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 ?>
@@ -85,7 +84,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		
@@ -104,10 +103,10 @@
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -137,7 +136,7 @@
 				  <thead>
 					<tr align="center">
 						<th scope="col">
-							<a href="/Employees/cadre.php?sort_by=id_pracownika&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							<a id="linktable" href="/Employees/cadre.php?sort_by=id_pracownika&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
 								#
 								<?php 
 								if($q_sort_by === "id_pracownika" && $q_sort_order === "ASC")
@@ -153,7 +152,7 @@
 							</a>
 						</th>
 						<th scope="col">
-							<a href="/Employees/cadre.php?sort_by=name&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							<a id="linktable" href="/Employees/cadre.php?sort_by=name&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
 								Imie i nazwisko
 								<?php 
 								if($q_sort_by === "name" && $q_sort_order === "ASC")
@@ -169,7 +168,7 @@
 							</a>
 						</th>
 						<th scope="col">
-							<a href="/Employees/cadre.php?sort_by=adres_email&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							<a id="linktable" href="/Employees/cadre.php?sort_by=adres_email&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
 								Adres e-mail
 								<?php 
 								if($q_sort_by === "adres_email" && $q_sort_order === "ASC")
@@ -185,7 +184,7 @@
 							</a>
 						</th>
 						<th scope="col">
-							<a href="/Employees/cadre.php?sort_by=admin&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
+							<a id="linktable" href="/Employees/cadre.php?sort_by=admin&sort_order=<?php echo $q_sort_order === "ASC" ? "DESC" : "ASC" ?>">
 								Admin
 								<?php 
 								if($q_sort_by === "admin" && $q_sort_order === "ASC")
@@ -245,7 +244,7 @@
 									</a>";
 									echo " <a href='/Employees/deleteEmployee.php?employee_id=" . $employee['id_pracownika'] . "' class='btn btn-danger btn-sm'
 									data-toggle='tooltip' data-placement='bottom' title='Usuń pracownika'>
-										<img src='/Assets/Icons/delete.svg' />
+										<img src='/Assets/Icons/DELETE.svg' />
 									</a>
 								</td>";
 							}

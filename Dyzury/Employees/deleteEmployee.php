@@ -25,7 +25,7 @@
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['employee_id']);
 			
-			$result = $connection->query("delete from pracownicy where id_pracownika = '$id' limit 1");
+			$result = $connection->query("DELETE FROM pracownicy WHERE id_pracownika = '$id' limit 1");
 			header('Location: cadre.php');
 		
 			if (!$result) throw new Exception($connection->error);
@@ -62,7 +62,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -82,10 +82,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>

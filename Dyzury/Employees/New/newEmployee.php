@@ -113,7 +113,7 @@
 			}
 			else
 			{
-				$result = $connection->query("SELECT id_pracownika FROM pracownicy where login = '$login'");
+				$result = $connection->query("SELECT id_pracownika FROM pracownicy WHERE login = '$login'");
 				
 				if (!$result) throw new Exception($connection->error);
 				
@@ -124,7 +124,7 @@
 					$_SESSION['e_login'] = "Istnieje już pracownik o takim loginie!";
 				}
 				
-				$result = $connection->query("SELECT id_pracownika FROM pracownicy where adres_email = '$email'");
+				$result = $connection->query("SELECT id_pracownika FROM pracownicy WHERE adres_email = '$email'");
 				
 				if (!$result) throw new Exception($connection->error);
 				
@@ -152,7 +152,7 @@
 		}
 		catch(Exception $e)
 		{
-			echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+			echo '<span style="color:red;">Błąd serwera!</span>';
 			echo '<br />Informacja developerska: '.$e;
 		}
 	}
@@ -182,7 +182,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -202,10 +202,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>

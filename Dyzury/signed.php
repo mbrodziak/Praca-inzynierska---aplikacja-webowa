@@ -12,6 +12,7 @@
 	
 	$confirmed_shift = [];
 	$registered_shift = [];
+	$today_date = date("Y-m-d");
 	
 	try
 	{
@@ -26,13 +27,33 @@
 		else 
 		{
 			$id = $_SESSION['id_employee'];
-			$query = "select dyzury.id_dyzuru, dyzury.tytul_dyzuru, dyzury.data_dyzuru 
-			from dyzury inner join dyzury_pracownikow where dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru 
-			and dyzury_pracownikow.id_pracownika = '$id' and potwierdzone = '1' and zarejestrowanie = '1' order by data_dyzuru desc";			
 			
-			$query2 = "select dyzury.id_dyzuru, dyzury.tytul_dyzuru, dyzury.data_dyzuru 
-			from dyzury inner join dyzury_pracownikow where dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru 
-			and dyzury_pracownikow.id_pracownika = '$id' and potwierdzone = '0' and zarejestrowanie = '1' order by data_dyzuru desc";
+			$query = "SELECT
+				dyzury.id_dyzuru, 
+				dyzury.tytul_dyzuru, 
+				dyzury.data_dyzuru, 
+				dyzury.godzina_rozpoczecia, 
+				dyzury.data_zakonczenia  
+			FROM dyzury 
+			INNER JOIN dyzury_pracownikow 
+			WHERE dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru 
+			AND dyzury_pracownikow.id_pracownika = '$id' 
+			AND potwierdzone = '1' 
+			AND zarejestrowanie = '1' 
+			ORDER BY data_dyzuru DESC";			
+			
+			$query2 = "SELECT 
+				dyzury.id_dyzuru, 
+				dyzury.tytul_dyzuru, 
+				dyzury.data_dyzuru,
+				dyzury.godzina_rozpoczecia, 
+				dyzury.data_zakonczenia 
+			FROM dyzury 
+			INNER JOIN dyzury_pracownikow 
+			WHERE dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru 
+			AND dyzury_pracownikow.id_pracownika = '$id' 
+			AND potwierdzone = '0' AND zarejestrowanie = '1' 
+			ORDER BY data_dyzuru DESC";
 			
 			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);			
@@ -88,7 +109,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" >
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -108,10 +129,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -133,24 +154,56 @@
 					<tr align="center">
 						<th scope="col" >#</th>
 						<th scope="col">Tytuł</th>
-						<th scope="col">Data dyzuru</th>
+						<th scope="col">Rozpoczęcie</th>
 					</tr>
 				  </thead>
 				  <tbody>
 					<?php
 						foreach ($confirmed_shift as $shift)
 						{
-							echo " 
-							<tr align='center'>
-							  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
-							  <td>" . $shift['tytul_dyzuru'] . "</td>
-							  <td>" . $shift['data_dyzuru'] . "</td>
-							</tr>";
+							if($today_date <= $shift['data_zakonczenia'])
+							{
+								echo " 
+								<tr align='center'>
+								  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
+								  <td>" . $shift['tytul_dyzuru'] . "</td>
+								  <td>" . $shift['data_dyzuru'] . " " . $shift['godzina_rozpoczecia'] . "</td>
+								</tr>";
+							}
 						}
 					?>
 				  </tbody>
 				</table>
-		
+						
+				<h3 class="d-flex flex-row justify-content-between my-3">
+					<div>Ended shifts</div>
+				</h3>
+				
+				<table class="table table-hover">	
+				  <thead>
+					<tr align="center">
+						<th scope="col" >#</th>
+						<th scope="col">Tytuł</th>
+						<th scope="col">Rozpoczęcie</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<?php
+						foreach ($confirmed_shift as $shift)
+						{
+							if($today_date >= $shift['data_zakonczenia'])
+							{
+								echo " 
+								<tr align='center'>
+								  <th scope='row'>" . $shift['id_dyzuru'] . "</th>
+								  <td>" . $shift['tytul_dyzuru'] . "</td>
+								  <td>" . $shift['data_dyzuru'] . " " . $shift['godzina_rozpoczecia'] . "</td>
+								</tr>";
+							}
+						}
+					?>
+				  </tbody>
+				</table>
 				  
 				<?php
 					if($_SESSION['admin'] == 0)
@@ -176,7 +229,7 @@
 									<tr align='center'>
 									  <th scope='row'>" . $shift2['id_dyzuru'] . "</th>
 									  <td>" . $shift2['tytul_dyzuru'] . "</td>
-									  <td>" . $shift2['data_dyzuru'] . "</td>
+									  <td>" . $shift2['data_dyzuru'] . " " . $shift2['godzina_rozpoczecia'] . "</td>
 									</tr>";
 								}
 						echo "</tbody>

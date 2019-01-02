@@ -98,7 +98,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	 
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -118,10 +118,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -151,7 +151,7 @@
 				  <thead>
 					<tr align='center'>
 					  <th scope="col">
-						<a href="/Shifts/shift.php?sort_by=id_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+						<a id="linktable" href="/Shifts/shift.php?sort_by=id_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
 							#
 							<?php 
 							if($sort_by === "id_dyzuru" && $sort_order === "ASC")
@@ -167,7 +167,7 @@
 						</a>					  
 					  </th>
 					  <th scope="col">
-						<a href="/Shifts/shift.php?sort_by=tytul_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+						<a id="linktable" href="/Shifts/shift.php?sort_by=tytul_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
 							Tytuł
 							<?php 
 							if($sort_by === "tytul_dyzuru" && $sort_order === "ASC")
@@ -183,7 +183,7 @@
 						</a>
 					  </th>
 					  <th scope="col">
-						<a href="/Shifts/shift.php?sort_by=data_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+						<a id="linktable" href="/Shifts/shift.php?sort_by=data_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
 							Rozpoczęcie
 							<?php 
 							if($sort_by === "data_dyzuru" && $sort_order === "ASC")
@@ -199,7 +199,7 @@
 						</a>
 					  </th>
 					  <th scope="col">
-					   	<a href="/Shifts/shift.php?sort_by=data_zakonczenia&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+					   	<a id="linktable" href="/Shifts/shift.php?sort_by=data_zakonczenia&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
 							Data zakończenia
 							<?php 
 							if($sort_by === "data_zakonczenia" && $sort_order === "ASC")
@@ -215,7 +215,7 @@
 						</a>
 					  </th>
 					  <th scope="col">
-						<a href="/Shifts/shift.php?sort_by=dlugosc_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
+						<a id="linktable" href="/Shifts/shift.php?sort_by=dlugosc_dyzuru&sort_order=<?php echo $sort_order === "ASC" ? "DESC" : "ASC" ?>">
 							Długość (h)
 							<?php 
 							if($sort_by === "dlugosc_dyzuru" && $sort_order === "ASC")
@@ -273,7 +273,7 @@
 									</a>
 									<a href='/Shifts/deleteShift.php?shift_id=" . $shift['id_dyzuru'] . "' class='btn btn-danger btn-sm'
 									data-toggle='tooltip' data-placement='bottom' title='Usuń dyżur'>
-										<img src='/Assets/Icons/delete.svg' />
+										<img src='/Assets/Icons/DELETE.svg' />
 									</a>";
 								}
 							  echo "</td>

@@ -25,30 +25,30 @@
 		{
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['id']);
-			$can_edit = true;
+			$can_register = true;
 			
 			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
+			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy WHERE login = '$login'");
 			
 			if (!$result) throw new Exception($connection->error);
 				
 			$row = $result->fetch_assoc();
 	
-			$result2 = $connection->query("select id_dyzuru from dyzury_pracownikow where id = '$id'");
+			$result2 = $connection->query("SELECT id_dyzuru FROM dyzury_pracownikow WHERE id = '$id'");
 			if (!$result2) throw new Exception($connection->error);
 			
 			$row2 = $result2->fetch_assoc();
 			$shift_id = $row2['id_dyzuru'];
 			echo "id_d" . " ". $shift_id;
 			
-			$result3 = $connection->query("select ilosc_miejsc from dyzury where id_dyzuru = '$shift_id'");
+			$result3 = $connection->query("SELECT ilosc_miejsc FROM dyzury WHERE id_dyzuru = '$shift_id'");
 			if (!$result3) throw new Exception($connection->error);
 			
 			$row3 = $result3->fetch_assoc();
 			$shift_capacity = $row3['ilosc_miejsc'];
 
-			$result4 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$shift_id' 
-			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
+			$result4 = $connection->query("SELECT * FROM dyzury_pracownikow WHERE id_dyzuru = '$shift_id' 
+			AND (potwierdzone = 1 OR (potwierdzone = 0 AND zarejestrowanie = 0))");
 			if (!$result4) throw new Exception($connection->error);
 			
 			$shift_busy = $result4->num_rows;
@@ -66,7 +66,7 @@
 						
 						else
 						{			
-							if($connection->query("update dyzury_pracownikow set potwierdzone = '1' where id = '$id'"))
+							if($connection->query("UPDATE dyzury_pracownikow SET potwierdzone = '1' WHERE id = '$id'"))
 							{					
 								header('Location: /Shifts/shift.php');	
 							}
@@ -80,7 +80,7 @@
 					else $_SESSION['e_password'] = "Proszę potwierdzić hasłem!";
 				}		
 			}
-			else $can_edit = false;
+			else $can_register = false;
 		}								
 	$connection->close();
 	}
@@ -114,7 +114,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -134,10 +134,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -159,7 +159,7 @@
 						<label>Potwierdź zgloszenie</label>
 						<input type="password" class="form-control" name="confirm_pass" id="confirm_pass" placeholder="Hasło" 					
 					<?php 
-						echo !$can_edit ? "disabled" : "";
+						echo !$can_register ? "disabled" : "";
 					?> />	
 					</div>
 					  
@@ -172,14 +172,16 @@
 					?> 
 					
 				  <div>
-					<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
+					<button type="submit" class="btn btn-primary"<?php 
+						echo !$can_register ? "disabled" : "";
+					?>>ZATWIERDŹ</button>
 					<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
 				  </div>
 				</form>	
 
 				<?php 
 					echo "<br/>";
-					echo $can_edit ? "" : "<div class='alert alert-danger' role='alert'>
+					echo $can_register ? "" : "<div class='alert alert-danger' role='alert'>
 						Brak wolnych miejsc!
 					</div>";			
 				?>				

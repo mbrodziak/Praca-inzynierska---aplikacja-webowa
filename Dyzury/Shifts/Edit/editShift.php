@@ -41,7 +41,7 @@
 					FROM    dyzury_pracownikow d
 					WHERE   d.id_dyzuru = dyzury.id_dyzuru
 				) as zajete 
-			FROM dyzury where id_dyzuru = '$id' limit 1";
+			FROM dyzury WHERE id_dyzuru = '$id' limit 1";
 					
 			$result = $connection->query($query);
 			
@@ -80,8 +80,7 @@
 				
 				if($ready == true)
 				{
-					if($connection->query("update dyzury set tytul_dyzuru = '$shift_name', data_dyzuru = '$shift_date', 
-					godzina_rozpoczecia = '$shift_start', data_zakonczenia = '$shift_date_end', dlugosc_dyzuru = '$shift_length', ilosc_miejsc = '$shift_capacity' where id_dyzuru='$id'"))
+					if($connection->query("UPDATE dyzury SET tytul_dyzuru = '$shift_name', data_dyzuru = '$shift_date', godzina_rozpoczecia = '$shift_start', data_zakonczenia = '$shift_date_end', dlugosc_dyzuru = '$shift_length', ilosc_miejsc = '$shift_capacity' WHERE id_dyzuru='$id'"))
 					{
 						header('Location: /Shifts/shift.php');
 					}
@@ -125,7 +124,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -145,10 +144,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>

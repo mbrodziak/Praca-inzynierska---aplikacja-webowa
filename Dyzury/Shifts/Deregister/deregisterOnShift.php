@@ -29,7 +29,7 @@
 			$can_deregister_date = true;
 			
 			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy where login = '$login'");
+			$result = $connection->query("SELECT id_pracownika, haslo, admin FROM pracownicy WHERE login = '$login'");
 			
 			if (!$result) throw new Exception($connection->error);
 				
@@ -37,7 +37,7 @@
 			$id_employee = $row['id_pracownika'];
 			$admin = $row['admin'];
 			
-			$result2 = $connection->query("SELECT * FROM dyzury_pracownikow where id_dyzuru = '$id' and id_pracownika = $id_employee");
+			$result2 = $connection->query("SELECT * FROM dyzury_pracownikow WHERE id_dyzuru = '$id' AND id_pracownika = $id_employee");
 			
 			if (!$result2) throw new Exception($connection->error);
 			
@@ -45,7 +45,7 @@
 			$confirm = $row2['potwierdzone'];
 			$register = $row2['zarejestrowanie'];
 			
-			$result3 = $connection->query("select data_dyzuru from dyzury where id_dyzuru = '$id'");
+			$result3 = $connection->query("SELECT data_dyzuru FROM dyzury WHERE id_dyzuru = '$id'");
 			if (!$result3) throw new Exception($connection->error);
 			
 			$row3 = $result3->fetch_assoc();
@@ -63,7 +63,7 @@
 					{	
 						if($admin == 1)
 						{
-							if($connection->query("delete from dyzury_pracownikow where id_dyzuru = '$id' and id_pracownika = $id_employee"))
+							if($connection->query("DELETE FROM dyzury_pracownikow WHERE id_dyzuru = '$id' AND id_pracownika = $id_employee"))
 							{					
 								header('Location: /Shifts/shift.php');	
 							}
@@ -74,8 +74,8 @@
 						}
 						else 
 						{		
-							if($connection->query("update dyzury_pracownikow set potwierdzone = '0', zarejestrowanie = '0' 
-							where id_dyzuru = '$id' and id_pracownika = '$id_employee'"))
+							if($connection->query("UPDATE dyzury_pracownikow SET potwierdzone = '0', zarejestrowanie = '0' 
+							WHERE id_dyzuru = '$id' AND id_pracownika = '$id_employee'"))
 							{					
 								header('Location: /Shifts/shift.php');	
 							}
@@ -126,7 +126,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -146,10 +146,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -185,7 +185,10 @@
 					?> 
 					
 					<div>
-						<button type="submit" name="confirm_pass_submit" class="btn btn-primary">ZATWIERDŹ</button>
+						<button type="submit" name="confirm_pass_submit" class="btn btn-primary"<?php 
+						echo !$can_deregister ? "disabled" : "";
+						echo !$can_deregister_date ? "disabled" : "";
+					?>>ZATWIERDŹ</button>
 						<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
 					</div>
 				</form>

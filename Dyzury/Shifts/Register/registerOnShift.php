@@ -14,7 +14,6 @@
 	//echo $tommorrow;
 	require_once __DIR__ . "/../../connect.php";	
 	mysqli_report(MYSQLI_REPORT_STRICT);
-				
 	$shifts = [];
 	
 	try
@@ -36,48 +35,49 @@
 			$can_register_date2 = true;
 			
 			$employee_id = $_SESSION['id_employee'];
-			$result = $connection->query("SELECT haslo, admin FROM pracownicy where id_pracownika = '$employee_id'");
+			$result = $connection->query("SELECT haslo, admin FROM pracownicy WHERE id_pracownika = '$employee_id'");
 			
 			if (!$result) throw new Exception($connection->error);	
 			$row = $result->fetch_assoc();
 			
-			$result2 = $connection->query("select data_dyzuru, ilosc_miejsc from dyzury where id_dyzuru = '$id'");
+			$result2 = $connection->query("SELECT data_dyzuru, data_zakonczenia, ilosc_miejsc FROM dyzury WHERE id_dyzuru = '$id'");
 			if (!$result2) throw new Exception($connection->error);
 			
 			$row2 = $result2->fetch_assoc();
 			$shift_date = $row2['data_dyzuru'];
+			$shift_date_end = $row2['data_zakonczenia'];
 			$shift_capacity = $row2['ilosc_miejsc'];
-			
-		
-			$result3 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$id' 
-			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
+				
+			$result3 = $connection->query("SELECT * FROM dyzury_pracownikow WHERE id_dyzuru = '$id' 
+			AND (potwierdzone = 1 OR (potwierdzone = 0 AND zarejestrowanie = 0))");
 			if (!$result3) throw new Exception($connection->error);
 			
 			$shift_busy = $result3->num_rows;
 			
-			$result4 = $connection->query("select data_dyzuru, data_zakonczenia from dyzury inner join dyzury_pracownikow 
-			where dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru and id_pracownika = '$employee_id'");
+			$result4 = $connection->query("SELECT data_dyzuru, data_zakonczenia FROM dyzury INNER JOIN dyzury_pracownikow 
+			WHERE dyzury.id_dyzuru = dyzury_pracownikow.id_dyzuru AND id_pracownika = '$employee_id'");
 			if (!$result4) throw new Exception($connection->error);
 			
-			$num_rows4 = $result4->num_rows;
-			for($i = 0; $i < $num_rows4; $i++)
-			{
-				$row4 = $result4->fetch_assoc();
-				$shift_date_emp[$i] = $row4['data_dyzuru'];
-				$shift_date_end_emp[$i] = $row4['data_zakonczenia'];
-			}			
+			//$num_rows4 = $result4->num_rows;
+			//var_dump($num_rows4);
+			// for($i = 0; $i < $num_rows4; $i++)
+			// {
+				// $row4 = $result4->fetch_assoc();
+				// $shift_date_emp[$i] = $row4['data_dyzuru'];
+				// $shift_date_end_emp[$i] = $row4['data_zakonczenia'];								
+			// }			
 			
-			for($i = 0; $i < $num_rows4; $i++)
-			{
+			// for($i = 0; $i < $num_rows4; $i++)
+			// {
 				// echo "R". " " . $shift_date_emp[$i] . "<br />";
 				// echo "Z". " " . $shift_date_end_emp[$i]  . "<br />";
 				// echo "DD". " " . $shift_date . "<br />";
-				if(($shift_date > $shift_date_emp[$i] ) && ( $shift_date <= $shift_date_end_emp[$i]))
-				{
-					$can_register_date2 = false;
-				}
-				else $can_register_date2 = true;
-			} 
+				// echo "DZ". " " . $shift_date_end . "<br />";
+				// if(($shift_date > $shift_date_emp[$i]) || ($shift_date <= $shift_date_emp[$i]))  && ($shift_date <= $shift_date_end_emp[$i])) 
+				// {
+					// $can_register_date2 = false;
+				// }
+			// }
 			
 			if($shift_date > $today)
 			{ 
@@ -92,11 +92,10 @@
 							
 							else
 							{	
-								$id_employee = $row['id_pracownika'];
 								$admin = $row['admin'];
 								if($admin == 1)
 								{
-									if($connection->query("insert into dyzury_pracownikow values (NULL, '$id', '$id_employee', 1, 1)"))
+									if($connection->query("INSERT INTO dyzury_pracownikow VALUES (NULL, '$id', '$employee_id', 1, 1)"))
 									{					
 										header('Location: /Shifts/shift.php');	
 									}
@@ -107,8 +106,7 @@
 								}
 								else
 								{ 
-									
-									if($connection->query("insert into dyzury_pracownikow values (NULL, '$id', '$id_employee', 0, 1)"))
+									if($connection->query("INSERT INTO dyzury_pracownikow VALUES (NULL, '$id', '$employee_id', 0, 1)"))
 									{					
 										header('Location: /Shifts/shift.php');	
 									}
@@ -159,7 +157,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -179,10 +177,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -217,7 +215,10 @@
 					?> 
 					
 					<div>
-						<button type="submit" class="btn btn-primary">ZATWIERDŹ</button>
+						<button type="submit" class="btn btn-primary"<?php 
+							echo !$can_register ? "disabled" : "";
+							echo !$can_register_date ? "disabled" : "";
+						?>>ZATWIERDŹ</button>
 						<a href="/Shifts/shift.php" class="btn btn-primary">ANULUJ</a>
 					</div>
 				</form>

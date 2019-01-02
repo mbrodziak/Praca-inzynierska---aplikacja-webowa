@@ -19,10 +19,12 @@
 		$connection -> query ('SET NAMES utf8');
 		$connection -> query ('SET CHARACTER_SET utf8_unicode_ci');
 	
-		if ($connection->connect_errno != 0){
+		if ($connection->connect_errno != 0)
+		{
 			throw new Exception(mysqli_connect_errno());
 		}
-		else {
+		else 
+		{
 			$login = $_POST['login'];
 			$pass = $_POST['pass'];
 		
@@ -34,8 +36,8 @@
 			{
 			
 				$employees = $result->num_rows;
-				if ($employees > 0){
-				
+				if ($employees > 0)
+				{
 					$row = $result->fetch_assoc();
 				
 					if (password_verify($pass, $row['haslo']))
@@ -56,25 +58,28 @@
 						$_SESSION['pass_hash'] = $row['haslo'];
 						$_SESSION['admin'] = $row['admin'];
 						
-						$connection->query("UPDATE pracownicy set ostatnie_logowanie = '$last_login' where login = '$login'");
+						$connection->query("UPDATE pracownicy SET ostatnie_logowanie = '$last_login' WHERE login = '$login'");
 				
 						unset($_SESSION['error']);
 						$result->free_result();
 						$_SESSION['signed'] = true;
 						header('Location: signed.php'); 
 					}
-					else{
-						$_SESSION['error'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
+					else
+					{
+						$_SESSION['error'] = 'Nieprawidłowy login lub hasło!';
 						header('Location: index.php');
 					}
 
 				}
-				else{
-					$_SESSION['error'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
+				else
+				{
+					$_SESSION['error'] = 'Nieprawidłowy login lub hasło!';
 					header('Location: index.php');
 				}				
 			}
-			else{
+			else
+			{
 				throw new Exception(mysqli_connect_errno);
 			}
 			$connection->close();
@@ -82,7 +87,7 @@
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! </span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 ?>		

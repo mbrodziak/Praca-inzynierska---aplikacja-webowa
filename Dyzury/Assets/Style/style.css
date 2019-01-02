@@ -21,18 +21,34 @@ body
 	font-size: 60px;
 }
 
-a
+/* a */
+/* { */
+	/* color: #000000; */
+	/* text-decoration: none; */
+/* } */
+
+/* a:hover */
+/* { */
+	/* color: #000000; */
+/* } */
+
+/* a:focus */
+/* { */
+	/* color: #000000; */
+/* } */
+
+#linktable
 {
 	color: #000000;
 	text-decoration: none;
 }
 
-a:hover
+#linktable:hover
 {
 	color: #000000;
 }
 
-a:focus
+#linktable:hover
 {
 	color: #000000;
 }
@@ -40,4 +56,9 @@ a:focus
 #confirm_pass
 {
 	background-color: #dddddd;
+}
+
+#edit
+{
+	color: blue;
 }

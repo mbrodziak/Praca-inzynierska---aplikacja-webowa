@@ -27,8 +27,8 @@
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
 			
-			$query = "select * from pracownicy inner join dyzury_pracownikow where pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika 
-			and dyzury_pracownikow.id_dyzuru = '$id'";
+			$query = "SELECT * FROM pracownicy INNER JOIN dyzury_pracownikow WHERE pracownicy.id_pracownika = dyzury_pracownikow.id_pracownika 
+			AND dyzury_pracownikow.id_dyzuru = '$id'";
 			
 			$result = $connection->query($query);
 			if (!$result) throw new Exception($connection->error);
@@ -40,7 +40,7 @@
 				$employees[] = $row;						
 			}
 			
-			$result2 = $connection->query("SELECT * FROM dyzury where id_dyzuru = '$id'");
+			$result2 = $connection->query("SELECT * FROM dyzury WHERE id_dyzuru = '$id'");
 			if (!$result2) throw new Exception($connection->error);
 			
 			$row2 = $result2->fetch_assoc();
@@ -52,8 +52,8 @@
 			$shift_length = $row2['dlugosc_dyzuru'];
 			$shift_capacity = $row2['ilosc_miejsc'];
 			
-			$result3 = $connection->query("select * from dyzury_pracownikow where id_dyzuru = '$shift_id' 
-			and (potwierdzone = 1 or (potwierdzone = 0 and zarejestrowanie = 0))");
+			$result3 = $connection->query("SELECT * FROM dyzury_pracownikow WHERE id_dyzuru = '$shift_id' 
+			AND (potwierdzone = 1 OR (potwierdzone = 0 AND zarejestrowanie = 0))");
 			if (!$result3) throw new Exception($connection->error);
 			
 			$shift_busy = $result3->num_rows;
@@ -95,7 +95,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -114,10 +114,10 @@
 		</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -200,7 +200,7 @@
 								{
 									if(($employee['potwierdzone'] == "Nie") && ($employee['zarejestrowanie'] == "Zarejestrowanie"))
 									{
-										echo "<a href='/Shifts/Register/confirmRegisterOnShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
+										echo "<a href='/Shifts/Register/confirmRegisterOnShift.php?id=" . $employee['id'] . "&id_employee=". $employee['id_pracownika']. "' class='btn btn-secondary btn-sm' 
 										data-toggle='tooltip' data-placement='left' title='Potwierdź'>
 											<img src='/Assets/Icons/confirm.svg' />
 										</a>";
@@ -225,7 +225,7 @@
 									{
 										echo " <a href='/Shifts/Register/deleteEmployeeWithShift.php?id=" . $employee['id'] . "' class='btn btn-secondary btn-sm' 
 										data-toggle='tooltip' data-placement='left' title='Usuń'>
-											<img src='/Assets/Icons/delete.svg' />
+											<img src='/Assets/Icons/DELETE.svg' />
 									 </a> ";
 									}
 									

@@ -26,7 +26,7 @@
 			parse_str($_SERVER['QUERY_STRING'], $qs);
 			$id = mysqli_real_escape_string($connection, $qs['shift_id']);
 			
-			$result = $connection->query("select data_dyzuru from dyzury where id_dyzuru = '$id' limit 1");
+			$result = $connection->query("SELECT data_dyzuru FROM dyzury WHERE id_dyzuru = '$id' limit 1");
 			if (!$result) throw new Exception($connection->error);
 			$row = $result->fetch_assoc();
 			$shift_date = $row['data_dyzuru'];
@@ -34,7 +34,7 @@
 			if($shift_date >= $next_week_date)
 			{
 				$login = $_SESSION['login'];
-				$result = $connection->query("SELECT haslo FROM pracownicy where login = '$login'");
+				$result = $connection->query("SELECT haslo FROM pracownicy WHERE login = '$login'");
 				
 				if (!$result) throw new Exception($connection->error);
 					
@@ -50,11 +50,11 @@
 						
 						else
 						{
-							$result = $connection->query("delete from dyzury where id_dyzuru = '$id' limit 1");
+							$result = $connection->query("DELETE FROM dyzury WHERE id_dyzuru = '$id' limit 1");
 						
 							if (!$result) throw new Exception($connection->error);
 						
-							$result = $connection->query("delete from dyzury_pracownikow where id_dyzuru = '$id' limit 1");
+							$result = $connection->query("DELETE FROM dyzury_pracownikow WHERE id_dyzuru = '$id' limit 1");
 						
 							if (!$result) throw new Exception($connection->error);
 							
@@ -73,7 +73,7 @@
 	}
 	catch(Exception $e)
 	{
-		echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie praocownika w innym terminie!</span>';
+		echo '<span style="color:red;">Błąd serwera!</span>';
 		echo '<br />Informacja developerska: '.$e;
 	}
 ?>
@@ -101,7 +101,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -121,10 +121,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>

@@ -23,15 +23,20 @@
 		else 
 		{
 			$login = $_SESSION['login'];
-			$result = $connection->query("SELECT * FROM pracownicy where login = '$login'");
+			$result = $connection->query("SELECT * FROM pracownicy WHERE login = '$login'");
 				
 			if (!$result) throw new Exception($connection->error);
 			
 			$row = $result->fetch_assoc();
 			
-			$_SESSION['birthday'] = $row['data_urodzenia'];
-			$_SESSION['email'] = $row['adres_email'];
-			$_SESSION['phone'] = $row['numer_telefonu'];
+			$name = $row['imie'];
+			$surname = $row['nazwisko'];
+			// $_SESSION['birthday'] = $row['data_urodzenia'];
+			// $_SESSION['email'] = $row['adres_email'];
+			// $_SESSION['phone'] = $row['numer_telefonu'];			
+			$birthday = $row['data_urodzenia'];
+			$email = $row['adres_email'];
+			$phone = $row['numer_telefonu'];
 		}
 		$connection->close();
 	}
@@ -66,7 +71,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" >
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -86,10 +91,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
@@ -129,21 +134,21 @@
 			
 			<div class="col">
 				<?php
-					echo $_SESSION['name'];
+					echo $name;
 					echo "<br />";
-					echo $_SESSION['surname'];
+					echo $surname;
 					echo "<br />";
-					echo $_SESSION['birthday'];
+					echo $birthday;
 					echo "
-						<a href='/Employees/Edit/changeBirthday.php' class='btn btn-color-white btn-sm'>
+						<a href='/Employees/Edit/changeBirthday.php' class='btn btn-sm'>
 							EDYTUJ
 						</a>";
 					echo "<br />";
-					echo $_SESSION['email'];
+					echo $email;
 					echo "<br />";
-					echo $_SESSION['phone'];
+					echo $phone;
 					echo "
-						<a href='/Employees/Edit/changePhone.php' class='btn btn-color-white btn-sm' >
+						<a href='/Employees/Edit/changePhone.php' class='btn btn-sm' >
 							EDYTUJ 
 						</a>";
 					echo "<br />";
@@ -151,7 +156,7 @@
 					echo "<br />";
 					echo $_SESSION['pass'];	
 					echo "
-						<a href='/Employees/Edit/changePass.php' class='btn btn-color-white btn-sm'>
+						<a href='/Employees/Edit/changePass.php' class='btn btn-sm'>
 							EDYTUJ
 						</a>";					
 				?>

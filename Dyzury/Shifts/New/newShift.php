@@ -68,7 +68,7 @@
 				if($ready == true)
 				{
 					$loginn = $_SESSION['login'];
-					$result = $connection->query("SELECT haslo FROM pracownicy where login = '$loginn'");
+					$result = $connection->query("SELECT haslo FROM pracownicy WHERE login = '$loginn'");
 					
 					if (!$result) throw new Exception($connection->error);
 						
@@ -81,7 +81,7 @@
 						
 						else
 						{
-							if($connection->query("INSERT INTO dyzury values (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_date_end', 
+							if($connection->query("INSERT INTO dyzury VALUES (NULL, '$shift_name', '$shift_date', '$shift_start', '$shift_date_end', 
 							'$shift_length', '$shift_capacity')"))
 							{
 								header('Location: /Shifts/shift.php');		
@@ -99,7 +99,7 @@
 		}
 		catch(Exception $e)
 		{
-			echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o dodanie dyżuru w innym terminie!</span>';
+			echo '<span style="color:red;">Błąd serwera!</span>';
 			echo '<br />Informacja developerska: '.$e;
 		}				
 	}
@@ -131,7 +131,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/">NA61 HW Shift</a>
 	  
-	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Przełącznik nawigacji">
+	  	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -151,10 +151,10 @@
 		
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
 					<?php echo $_SESSION['name']." ".$_SESSION['surname']; ?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/Employees/profil.php">Profil</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/logout.php">Wyloguj się</a>
